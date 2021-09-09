@@ -1,0 +1,66 @@
+﻿@inject IModalService ModalService
+
+<div class="simple-form">
+
+    <div class="form-control form-group @_warningStyle mb-5">
+        <label class="ite" for="movie-name">@Line1</label>
+
+        @if (!string.IsNullOrEmpty(Line2))
+        {
+        <label  for="movie-name">@Line2</label>
+        }
+    </div>
+
+    <button @onclick="@OK" class="btn btn-primary"> <span class="ml-2 mr-2"> OK </span></button>
+    <button @onclick="@Cancel" class="btn btn-secondary">Cancel</button>
+</div>
+
+@code {
+
+    [CascadingParameter] ModalParameters Parameters { get; set; }
+
+    string Line1 { get; set; }
+    string Line2 { get; set; }
+    bool Warning { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+
+
+        Line1 = Parameters.Get<string>("Line1");
+        Line2 = Parameters.Get<string>("Line2");
+        Warning = Parameters.TryGet<bool>("Warning");
+
+    }
+
+    string _warningStyle
+    {
+        get
+        {
+
+            if (Warning)
+            {
+                return "border-danger";
+            }
+            else
+            {
+                return "";
+            }
+
+        }
+    }
+
+
+    void OK()
+    {
+
+        ModalService.Close(ModalResult.Ok<bool>(true));
+    }
+
+    void Cancel()
+    {
+        ModalService.Cancel();
+    }
+
+}

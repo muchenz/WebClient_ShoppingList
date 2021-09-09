@@ -1,0 +1,154 @@
+﻿@page "/"
+@namespace ShoppingList_WebClient.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShoppingList_WebClient</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="_content/Blazored.Modal/blazored-modal.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+
+    <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
+
+</head>
+<body>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+    <script type="text/javascript">
+        window.getDimensions = function () {
+            return {
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+        };
+
+        window.browserResize = {
+            getInnerHeight: function () {
+                return window.innerHeight;
+            },
+            getInnerWidth: function () {
+                return window.innerWidth;
+            },
+            registerResizeCallback: function () {
+                window.addEventListener("resize", browserResize.resized);
+            },
+            resized: function () {
+                //DotNet.invokeMethod("BrowserResize", 'OnBrowserResize');
+                DotNet.invokeMethodAsync("BlazorClient", 'OnBrowserResize', window.innerWidth).then(data => data);
+            }
+        }
+
+
+    </script>
+
+    <app>
+        <component type="typeof(App)" render-mode="Server" />
+    </app>
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script>
+
+        function SayHelloJS() {
+
+
+            $('#ButtonCollapseExample').click(function () {
+
+                if ($(this).attr('aria-expanded') == "false") {
+                    $(this).text('Hide Groups')
+                    $(this).attr('aria-expanded', "true");
+                } else {
+                    $(this).text('Show Groups')
+                    $(this).attr('aria-expanded', "false");
+
+                }
+
+
+            });
+
+
+            $('#ButtonCollapseExample1').click(function () {
+
+                if ($(this).attr('aria-expanded') == "false") {
+                    $(this).text('Hide Lists')
+                    $(this).attr('aria-expanded', "true");
+                } else {
+                    $(this).text('Show Lists')
+                    $(this).attr('aria-expanded', "false");
+
+                }
+            });
+
+            var firstBigRender = true;
+            var firstSmallRender = true;
+
+            $(window).on('resize', function () {
+                var win = $(this); //this = window
+                if (win.width() < 992) {
+
+
+                    firstBigRender = true;
+
+                    if (firstSmallRender) {
+                        $('#collapseExample1').attr("class", "collapse");
+                        $('#collapseExample').attr("class", "collapse");
+                        firstSmallRender = false;
+                        firstBigRender = true;
+
+                        $('#ButtonCollapseExample1').text('Show Lists')
+                        $('#ButtonCollapseExample1').attr('aria-expanded', "flase");
+
+                        $('#ButtonCollapseExample').text('Show Groups')
+                        $('#ButtonCollapseExample').attr('aria-expanded', "false");
+
+                    }
+                } else {
+
+                    if (firstBigRender) {
+                        $('#collapseExample1').attr("class", "collapse show");
+                        $('#collapseExample').attr("class", "collapse show");
+                        firstBigRender = false;
+                        firstSmallRender = true;
+
+
+                    }
+                }
+
+            });
+
+        }
+
+        function Collapse() {
+
+            $('#collapseExample1').attr("class", "collapse");
+            $('#collapseExample').attr("class", "collapse");
+
+
+        }
+
+    </script>
+</body>
+</html>

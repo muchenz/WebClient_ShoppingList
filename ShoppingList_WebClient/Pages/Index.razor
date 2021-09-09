@@ -1,0 +1,61 @@
+﻿@page "/index"
+@page "/"
+
+
+@using Blazored.LocalStorage
+@inject NavigationManager navigationManager
+@inject ILocalStorageService localStorageService
+
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Welcome, <b>@context.User.Identity.Name</b></h3>
+    </Authorized>
+    <NotAuthorized>
+        <h3>You are signed out!!!</h3>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="User">
+    <Authorized>
+        <h3><b>You are a User</b></h3>
+    </Authorized>
+    <NotAuthorized>
+        <h3>You are not a User</h3>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+
+    //    await base.OnAfterRenderAsync(firstRender);
+
+
+    //    //await base.OnInitializedAsync();
+
+    //    var accessToken = await localStorageService.GetItemAsync<string>("accessToken");
+
+    //    accessToken = null;
+    //    if (accessToken == null)
+    //        navigationManager.NavigateTo("/login");
+    //}
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var accessToken = await localStorageService.GetItemAsync<string>("accessToken");
+
+        if (accessToken == null)
+            navigationManager.NavigateTo("/login");
+        else
+            navigationManager.NavigateTo("/shoppinglist");
+    }
+}

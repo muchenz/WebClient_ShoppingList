@@ -1,0 +1,28 @@
+﻿@*@using Microsoft.AspNetCore.Hosting*@
+@*@using Microsoft.Extensions.Hosting*@
+
+@inject IToastService _toastService
+
+@*@inject IWebHostEnvironment _webHostEnvironment*@
+
+
+<CascadingValue Value=this>
+    @ChildContent
+</CascadingValue>
+
+@code
+{
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public void ProcessError(Exception ex)
+    {
+        //if (!_webHostEnvironment.IsDevelopment())
+        //    _toastService.ShowError("Somting went wrong");
+        //else
+        _toastService.ShowError("Somting went wrong- check log  "+ ex.Message);
+
+    }
+
+}

@@ -1,0 +1,98 @@
+﻿@page  "/register"
+
+@using Newtonsoft.Json
+@using Services
+@using ShoppingList_WebClient.Data
+@using System.ComponentModel.DataAnnotations
+@using ShoppingList_WebClient.Models
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject UserService userService;
+
+    <EditForm OnValidSubmit="@ValidateUser" Model="registrationrModel">
+        <DataAnnotationsValidator />
+        
+        <div>
+            <br /><br /><br /><br /><br />
+        </div>
+        <div>
+            <h3 style="font-weight:bold; color:purple">Registration</h3>
+        </div>
+        <div>
+            <br />
+        </div>
+        <div class="col-12 row">
+            <InputText class="form-control col-12" @bind-Value="registrationrModel.UserName" placeholder="email address" />
+            <ValidationMessage For="@(() => registrationrModel.UserName)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <InputText type="password" class="form-control col-12" @bind-Value="registrationrModel.Password" placeholder="password" />
+            <ValidationMessage For="@(() => registrationrModel.Password)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <InputText type="password" class="form-control col-12" @bind-Value="registrationrModel.PasswordConfirm" placeholder="confirm password" />
+            <ValidationMessage For="@(() => registrationrModel.PasswordConfirm)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <span class="col-12"></span>
+            <input type="submit" class="form-control col-6 btn btn-primary" value="Register" />
+            <a href="/signup" class="col-3">Sign up</a>
+        </div>
+        <br />
+        <div class="col-12 row" style="text-align:left; font-weight:bold">
+            <span class="col-12">@LoginMesssage</span>
+        </div>
+
+    </EditForm>
+
+@code {
+
+
+    //private User user;
+    public string LoginMesssage { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        //user = new User();
+        return base.OnInitializedAsync();
+    }
+
+
+    RegistrationModel registrationrModel = new RegistrationModel();
+
+    private async Task<bool> ValidateUser()
+    {
+        //assume that user is valid
+        //call an API
+
+        string token = null;
+        try
+        {
+            token = await userService.RegisterAsync(registrationrModel);
+        }
+        catch(Exception ex)
+        {
+
+        }
+
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
+             NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            LoginMesssage = "Some Errors";
+        }
+
+        return await Task.FromResult(true);
+    }
+
+
+}

@@ -1,0 +1,119 @@
+﻿@implements IDisposable
+
+@using Services
+@using Data
+@using System.Security.Claims;
+
+
+@inject UserService userService
+@inject AuthenticationStateProvider authenticationStateProvider
+
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">BlazorClient</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="shoppinglist">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Shopping list
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="userspermissions">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Users permissions
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="invitations">
+                @if (NuberOfInvitations > 0)
+                {
+                    <span><span class="oi oi-list-rich" aria-hidden="true"></span> Invitations <span class="text-danger small">(NEW @NuberOfInvitations)</span></span>
+                }
+                else
+                {
+                    <span><span class="oi oi-list-rich" aria-hidden="true"></span> Invitations </span>
+
+                }
+            </NavLink>
+        </li>
+    </ul>
+</div>
+
+
+
+
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+            var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var userName = authProvider.User.Identity.Name;
+
+            NuberOfInvitations = (await userService.GetInvitationsListAsync(userName)).Count;
+
+            var userId = authProvider.User.Claims.Where(a => a.Type.EndsWith("nameidentifier")).FirstOrDefault().Value;
+
+            Console.WriteLine($"NavMenu userid {userId}");
+
+            authProvider.User.Claims.ToList().ForEach(a => Console.WriteLine($"claims {a.Type}, value {a.Value}"));
+
+            if (userId != null)
+                await SignalRInitAsync(int.Parse(userId));
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"{ex}");
+
+        }
+    }
+
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+
+    int NuberOfInvitations;
+
+    async Task SignalRInitAsync(int userId)
+    {
+
+
+        SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
+       userId,
+        authenticationStateProvider,
+        userService,
+        (_) => { },
+        (a) => NuberOfInvitations = a,
+        StateHasChanged);
+
+    }
+
+    List<IDisposable> SignalRToDispose;
+
+    public void Dispose()
+    {
+        SignalRToDispose?.ForEach(a => a?.Dispose());
+    }
+}
+

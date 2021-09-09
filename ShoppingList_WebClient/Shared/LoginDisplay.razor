@@ -1,0 +1,31 @@
+﻿@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+
+@using ShoppingList_WebClient.Data
+
+<AuthorizeView>
+    <Authorized>
+        <a href="">@context.User.Identity.Name</a>
+
+        <button type="submit" class="nav-link btn btn-link" @onclick="ButtonClick">Log out</button>
+
+    </Authorized>
+    <NotAuthorized>
+        <a href="/Register">Register</a>
+        <a href="/Login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+
+    void ButtonClick()
+    {
+
+        ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+
+        navigationManager.NavigateTo("/login");
+
+
+    }
+
+}

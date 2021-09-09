@@ -1,0 +1,35 @@
+﻿@inject IModalService ModalService
+
+<div class="simple-form">
+
+    <div class="form-group">
+        <label for="movie-name">@Info</label>
+       
+    </div>
+
+    <button @onclick="@OK" class="btn btn-primary">Submit</button>
+   
+</div>
+
+@code {
+
+    [CascadingParameter] ModalParameters Parameters { get; set; }
+
+    string Info { get; set; }
+
+    protected override void OnInitialized()
+    {
+
+
+        Info = Parameters.Get<string>("Info");
+    }
+    
+
+
+    void OK()
+    {
+
+        ModalService.Close();
+    }
+
+}

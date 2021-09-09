@@ -1,0 +1,131 @@
+﻿@page  "/login"
+
+@using Newtonsoft.Json
+@using Services
+@using ShoppingList_WebClient.Data 
+@using Microsoft.Extensions.Logging
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
+@inject UserService userService;
+@inject ILogger<Login> _logger
+
+<EditForm OnValidSubmit="@ValidateUser" Model="@this">
+    <div>
+        <br /><br /><br /><br /><br />
+    </div>
+    <div>
+        <h3 style="font-weight:bold; color:purple">Book Stores Login</h3>
+    </div>
+    <div>
+        <br />
+    </div>
+    <div class="col-12 row">
+        <input class="form-control col-12" @bind="userName" placeholder="email address" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <input type="password" class="form-control col-12" @bind="password" placeholder="password" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <span class="col-12"></span>
+        <input type="submit" class="form-control col-6 btn btn-primary" value="Login" />
+        <a href="/signup" class="col-3">Sign up</a>
+    </div>
+    <br />
+    <div class="col-12 row" style="text-align:left; font-weight:bold">
+        <span class="col-12">@LoginMesssage</span>
+    </div>
+
+</EditForm>
+
+<div>
+    <button @onclick="FacebookSignIn">Facebook</button>
+</div>
+@code {
+   
+    string userName, password;
+
+    //private User user;
+    public string LoginMesssage { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+
+        if (NavigationManager.GetParameter("error")!=null)
+        {
+            LoginMesssage = NavigationManager.GetParameter("error");
+        }
+        else if (NavigationManager.GetParameter("token") != null)
+        {
+            var token = NavigationManager.GetParameter("token");
+
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
+                .MarkUserAsAuthenticated(token);
+            NavigationManager.NavigateTo("/shoppinglist",true);
+        }
+
+
+
+
+        return base.OnInitializedAsync();
+    }
+
+    [CascadingParameter]
+    public Error Error { get; set; }
+
+    private async Task ValidateUser()
+    {
+        //assume that user is valid
+        //call an API
+        try
+        {
+            try
+            {
+                //throw new Exception("Ala ");
+
+                var message = await userService.LoginAsync(userName, password);
+
+
+
+                if (message != null && message.Status == "OK")
+                {
+                    ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(message.Message);
+                    NavigationManager.NavigateTo("/shoppinglist",true);
+                }
+                else
+                {
+                    LoginMesssage = "Invalid username or password";
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LoginMesssage = "Some errors";
+                Error.ProcessError(ex);
+                throw new NullReferenceException("Inner ", ex);
+
+            }
+        }
+        catch(NullReferenceException ex)
+        {
+            _logger.LogError(ex, "alla");
+        }
+    }
+
+    void FacebookSignIn()
+    {
+
+        NavigationManager.NavigateTo(string.Format("https://www.facebook.com/v10.0/dialog/oauth?client_id={0}&response_type=code&redirect_uri={1}&state={2}&scope={3}",
+        259675572518658,
+         //"https://localhost:44394/signinfacebook",
+         "https://localhost:5001/api/User",
+        // "https://www.facebook.com/connect/login_success.html",
+        "{st=state123abc,ds=123456789}", "public_profile,email"));
+    }
+
+
+}

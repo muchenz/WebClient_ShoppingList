@@ -1,0 +1,7 @@
+﻿.no-drop {
+    background-color: rgba(250, 0, 0, 0.05);
+}
+
+.can-drop {
+    background-color: rgba(0, 250, 0, 0.05);
+}

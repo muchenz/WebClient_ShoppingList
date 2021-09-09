@@ -1,0 +1,344 @@
+﻿@using ShoppingList_WebClient.Models
+
+@inject IModalService Modal
+
+@if (GetItemId() != EditListItemId)
+{
+    <table style="width:inherit">
+        <tr>
+            <td style="@TableTdWidthStyle">
+                <div ondragover="event.preventDefault();">
+                    <div class="btn btn-block @GetBtnStyle @CanDrop" style="align-content:flex-start;cursor: pointer;@BuyedStyle" draggable="true"
+                         @onclick="(() => ListItemClicked(item))" @ondragstart="(() => ListItemDragStart(item))" @ondragover="() => ListItemDragOver(item)"
+                         @ondrop="(() => ListItemDrop(item))" @ondragleave="(() => ListItemDreagLeave())" @ondblclick="(() => ListItemDoubleClick(item))">
+
+                        <span class="oi oi-plus" aria-hidden="true"></span> @GetItemName()
+
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="mx-2 d-flex flex-column">
+                    @if (EditItemEvent.HasDelegate && Permission != null && Permission <= 2)
+                    {
+                       <div><a style="text-underline-position:below; cursor:pointer; color:blue; text-align:left" @onclick="(() => EditItem(item))">Edit</a></div>
+                    }
+                    else if (EditItemEvent.HasDelegate && Permission != null)
+                    {
+                        <div><a style="text-underline-position:below; cursor:not-allowed; color:lightgray; text-align:left">Edit</a></div>
+
+                    }
+                    @if (DeleteItemEvent.HasDelegate && Permission != null && Permission == 1)
+                    {
+                        <div><a style="text-underline-position:below; cursor:pointer; color:blue; text-align:left" @onclick="(() => DeleteItem(item))">Delete</a></div>
+                    }
+                    else  if (DeleteItemEvent.HasDelegate && Permission != null)
+                    {
+                        <div><a style="text-underline-position:below; cursor:not-allowed; color:lightgray; text-align:left">Delete</a></div>
+
+                    }
+                </div>
+            </td>
+        </tr>
+    </table>
+}
+else
+{
+
+
+    <table style="width:inherit;margin-left:3px; margin-bottom:8px">
+        <tr>
+            <td style="width:81%">
+                <EditForm Model="item">
+
+                    <InputText class="form-control" @bind-Value="@ItemName" />
+                </EditForm>
+            </td>
+            <td align="center">
+                <a style="text-underline-position:below; cursor:pointer; color:blue; display:inline;
+                                " @onclick="(() => SaveItem(item))">Save</a>
+            </td>
+        </tr>
+
+    </table>
+
+
+
+
+    @*<EditForm Model="item">
+            <div class="row>">
+                <div class="col-10">
+                    <InputText class="form-control col-3" @bind-Value="item.ListItemName" placeholder="email address" />
+                </div>
+                <div class="col-2">
+                    <a style="text-underline-position:below; cursor:pointer; color:blue; display:inline" @onclick="(() => SaveItem(item))">Save</a>
+                </div>
+            </div>
+
+        </EditForm>*@
+}
+@code{
+    [Parameter] public IModelItemView item { get; set; }
+    [Parameter] public int? ChoosedItemId { get; set; }
+    [Parameter] public int? Permission { get; set; }
+
+
+    [Parameter] public int EditListItemId { get; set; }
+
+
+    [Parameter] public EventCallback<IModelItemView> ListItemClickedEvent { get; set; }
+    [Parameter] public EventCallback<IModelItemView> ListItemDoubleClickedEvent { get; set; }
+
+
+    [Parameter] public EventCallback<IModelItemView> ListItemDragStartEvent { get; set; }
+
+    [Parameter] public EventCallback<IModelItemView> ListItemDropEvent { get; set; }
+    [Parameter] public EventCallback<IModelItemView> EditItemEvent { get; set; }
+    [Parameter] public EventCallback<IModelItemView> DeleteItemEvent { get; set; }
+    [Parameter] public EventCallback<IModelItemView> SaveItemEvent { get; set; }
+
+
+    async Task ListItemClicked(IModelItemView item) => await ListItemClickedEvent.InvokeAsync(item);
+    async Task ListItemDoubleClick(IModelItemView item) => await ListItemDoubleClickedEvent.InvokeAsync(item);
+
+
+    string BuyedStyle
+    {
+        get
+        {
+
+            if (item is ListItem)
+            {
+                var it = (ListItem)item;
+
+
+                if (it.State == ItemState.Buyed)
+                    return "text-decoration-line:line-through;  color:gray";
+
+                else
+                    return "";
+
+            }
+            return "";
+        }
+    }
+
+
+    async Task ListItemDragStart(IModelItemView item)
+    {
+        _itemDragStart = item;
+        await ListItemDragStartEvent.InvokeAsync(item);
+    }
+
+    async Task ListItemDrop(IModelItemView item)
+    {
+
+        if (_itemDragStart.GetType() == item.GetType())
+            await ListItemDropEvent.InvokeAsync(item);
+    }
+    async Task EditItem(IModelItemView item) => await EditItemEvent.InvokeAsync(item);
+
+
+    async Task DeleteItem(IModelItemView item)
+    {
+        if (item.GetType() == typeof(ListItem))
+        {
+            await DeleteItemEvent.InvokeAsync(item);
+            return;
+        }
+
+        var param = new ModalParameters();
+        param.Add("Name", item.Name);
+        param.Add("FullInfo", true);
+
+
+        Modal.OnClose += ModalDelelete;
+
+
+        Modal.Show<ModalDelete>("Delete", param);
+
+
+    }
+
+    async void ModalDelelete(ModalResult res)
+    {
+
+        if (res.Data != null && (bool)res.Data)
+        {
+            await DeleteItemEvent.InvokeAsync(item);
+
+        }
+        Modal.OnClose -= ModalDelelete;
+    }
+
+    async Task SaveItem(IModelItemView item) => await SaveItemEvent.InvokeAsync(item);
+
+
+
+    string CanDrop { get; set; }
+
+
+    IModelItemView _itemDragOver;
+
+    static IModelItemView _itemDragStart;
+
+
+    async Task ListItemDreagLeave()
+    {
+        //await DeleteCanDropColor(300);
+
+    }
+
+    async Task ListItemDragOver(IModelItemView itemOver)
+    {
+        var tempCanDrop = CanDrop;
+
+        if (_itemDragStart != null && itemOver != null)
+            if (_itemDragStart.GetType() == itemOver.GetType())
+            {
+
+                if (string.IsNullOrEmpty(tempCanDrop))
+                {
+                    CanDrop = "can-drop";
+                    await DeleteCanDropColor(300);
+
+                }
+            }
+            else
+            {
+
+                if (string.IsNullOrEmpty(tempCanDrop))
+                {
+                    CanDrop = "no-drop";
+                    await DeleteCanDropColor(300);
+                }
+            }
+
+
+    }
+
+    async Task DeleteCanDropColor(int delay)
+    {
+        await Task.Run(async () =>
+        {
+            await Task.Delay(delay);
+            CanDrop = "";
+
+        });
+    }
+
+
+    public string GetBtnStyle
+    {
+        get
+        {
+
+            if (GetItemId() == ChoosedItemId)
+                return "btn-secondary";
+            else
+                return "btn-light";
+
+        }
+    }
+
+    int GetItemId()
+    {
+
+        switch (item)
+        {
+            case ListItem listItem:
+                return listItem.ListItemId;
+            case List list:
+                return list.ListId;
+            case ListAggregator listAggregator:
+                return listAggregator.ListAggregatorId;
+            case UserPermissionToListAggregation user:
+                return user.User.UserId;
+
+        }
+
+        return item.Id;
+    }
+
+    string GetItemName()
+    {
+        switch (item)
+        {
+            case ListItem listItem:
+                return listItem.ListItemName; ;
+            case List list:
+                return list.ListName;
+            case ListAggregator listAggregator:
+                return listAggregator.ListAggregatorName;
+            case UserPermissionToListAggregation user:
+                return user.User.EmailAddress;
+
+        }
+
+
+        return item.Name;
+    }
+
+
+
+    public string ItemName
+    {
+        get
+        {
+            switch (item)
+            {
+                case ListItem listItem:
+                    return listItem.ListItemName;
+                case List list:
+                    return list.ListName;
+                case ListAggregator listAggregator:
+                    return listAggregator.ListAggregatorName;
+                case UserPermissionToListAggregation user:
+                    return user.User.EmailAddress;
+
+            }
+
+            return item.Name;
+        }
+        set
+        {
+
+            switch (item)
+            {
+                case ListItem listItem:
+                    listItem.ListItemName = value;
+                    return;
+                case List list:
+                    list.ListName = value;
+                    return;
+                case ListAggregator listAggregator:
+                    listAggregator.ListAggregatorName = value;
+                    return;
+                case UserPermissionToListAggregation user:
+                    user.User.EmailAddress = value;
+                    return;
+
+            }
+
+            item.Name = value;
+        }
+
+    }
+
+    string TableTdWidthStyle
+    {
+        get
+        {
+            if (!EditItemEvent.HasDelegate && !DeleteItemEvent.HasDelegate)
+
+                return "width:100%";
+            else
+                return "width:90%";
+
+
+        }
+    }
+}
+
+
+

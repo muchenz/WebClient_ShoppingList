@@ -1,0 +1,760 @@
+﻿@page "/shoppinglist"
+@attribute [Authorize]
+
+@using Services
+@using Models
+@using Blazored.LocalStorage;
+@using Data;
+@using Microsoft.AspNetCore.SignalR.Client;
+@using Microsoft.Extensions.Configuration;
+
+@inject UserService userService
+@inject ShoppingListService shoppingListService
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject BrowserService broserService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigationManager
+@inject IConfiguration configuration
+
+<div class="row d-lg-none" style="margin-bottom:15px">
+    <div class="col">
+        <button id="ButtonCollapseExample" class="btn btn-block btn-dark" data-toggle="collapse" data-target="#collapseExample"
+                role="button" aria-expanded="false" aria-controls="collapseExample">
+            Show Groups
+        </button>
+    </div>
+    <div class="col">
+        <button id="ButtonCollapseExample1" class="btn btn-block btn-dark" data-toggle="collapse" data-target="#collapseExample1" role="button"
+                aria-expanded="false" aria-controls="collapseExample1">
+            Show Lists
+        </button>
+    </div>
+</div>
+
+
+<div class="container" style="@styleForContainer">
+
+    <div class="row">
+
+        <div class="@card  col-lg-3">
+            <div class="collapse show" id="collapseExample">
+                @if (!string.IsNullOrEmpty(card))
+                {<h5 style="text-align:center;background-color:lightgray;width:inherit;margin-left:-15px;margin-right:-15px">Groups:</h5>}
+
+                <table style="width:inherit;margin-left:3px; margin-bottom:20px">
+                    <tr>
+                        <td style="width:81%">
+                            <EditForm Model="AddListAggregator">
+
+                                <InputText class="form-control" @bind-Value="AddListAggregator.ListAggregatorName" placeholder="New list hub" />
+                            </EditForm>
+                        </td>
+                        <td align="center">
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; display:inline;
+                                " @onclick="(() => AddToListAggregator())">Add</a>
+                        </td>
+                    </tr>
+                </table>
+
+
+
+
+
+                <div class="">
+                    <ul class="nav flex-column">
+
+                        @if (data != null)
+                            @foreach (var item in data.ListAggregators)
+                            {
+                                @*<li class="list-group-item-light p-1">
+
+                                        <div class="btn btn-block btn-light" style="cursor: pointer"
+                                                @onclick="(() => ListAggregationClicked(item))">
+                                            <span class="oi oi-plus" aria-hidden="true"></span> @item.ListAggregatorName
+                                        </div>
+                                    </li>*@
+
+
+                                <li class="p-1">
+
+                                    <ListItemComponent DeleteItemEvent="(() => DeleteListAggregator(item))"
+                                                       EditItemEvent="(() => EditListAggregator(item))"
+                                                       EditListItemId="EditListAggregatorId"
+                                                       item="@item"
+                                                       Permission="@item.PermissionLevel"
+                                                       ChoosedItemId="@listAggregatorChoosed?.ListAggregatorId"
+                                                       ListItemClickedEvent="(() => ListAggregationClicked(item))"
+                                                       ListItemDragStartEvent="(() => ListAggregatorDragStart(item))"
+                                                       ListItemDropEvent="(() => ListAggregatorDrop(item))"
+                                                       SaveItemEvent="(() => SaveListAggregator(item))"></ListItemComponent>
+
+                                </li>
+                            }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="@card col-lg-3">
+            <div class="collapse show" id="collapseExample1">
+
+                @if (!string.IsNullOrEmpty(card))
+                {<h5 style="text-align:center;background-color:lightgray;width:inherit;margin-left:-15px;margin-right:-15px">Lists:</h5>}
+
+                <table style="width:inherit;margin-left:3px; margin-bottom:20px">
+                    <tr>
+                        <td style="width:81%">
+                            <EditForm Model="AddList">
+                                @if (listAggregatorChoosed?.PermissionLevel < 3)
+                                {
+                                    <InputText class="form-control" @bind-Value="AddList.ListName" placeholder="New list of ltem" />
+                                }
+                                else
+                                {
+                                    <InputText class="form-control" @bind-Value="AddList.ListName" placeholder="New list of ltem" readonly />
+
+                                }
+                            </EditForm>
+                        </td>
+                        <td align="center">
+                            @if (listAggregatorChoosed?.PermissionLevel < 3)
+                            {
+                                <a style="text-underline-position:below; cursor:pointer; color:blue; display:inline;
+                                " @onclick="(() => AddToList())">Add</a>
+                            }
+                            else
+                            {
+                                <a style="text-underline-position:below; cursor:not-allowed; color:lightgray; text-align:left">Add</a>
+
+                            }
+                        </td>
+                    </tr>
+
+                </table>
+
+                <div class="">
+                    <ul class="nav flex-column">
+
+                        @if (listAggregatorChoosed != null)
+                            @foreach (var item in listAggregatorChoosed.Lists)
+                            {
+                                <li class="p-1">
+                                    @*<button class="btn btn-block btn-light"
+                                                @onclick="(() => ListClicked(item))">
+                                            <span class="oi oi-plus" aria-hidden="true"></span> @item.ListName
+                                        </button>*@
+
+
+                                    <ListItemComponent DeleteItemEvent="(() => DeleteList(item))"
+                                                       EditItemEvent="(() => EditList(item))"
+                                                       EditListItemId="EditListId"
+                                                       item="@item"
+                                                       Permission="@listAggregatorChoosed.PermissionLevel"
+                                                       ChoosedItemId="@listChoosed?.ListId"
+                                                       ListItemClickedEvent="(() => ListClicked(item))"
+                                                       ListItemDragStartEvent="(() => ListDragStart(item))"
+                                                       ListItemDropEvent="(() => ListDrop(item))"
+                                                       SaveItemEvent="(() => SaveList(item))"></ListItemComponent>
+
+                                </li>
+                            }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="@card col-lg-6">
+
+            <table style="width:inherit;margin-left:3px; margin-bottom:20px">
+                <tr>
+                    <td style="width:81%">
+                        <EditForm @ref="AddListItemEditForm" EditContext="@AddListItemEditContext">
+
+                            @if (listAggregatorChoosed?.PermissionLevel < 3)
+                            {
+                                <InputText class="form-control" @bind-Value="AddListItem.ListItemName" placeholder="New item to buy" />
+                            }
+                            else
+                            {
+                                <InputText class="form-control" @bind-Value="AddListItem.ListItemName" placeholder="New item to buy" readonly />
+                            }
+
+                        </EditForm>
+                    </td>
+                    <td align="center">
+                        @if (listAggregatorChoosed?.PermissionLevel < 3)
+                        {
+                            <a style="text-underline-position:below; cursor:pointer; color:blue; display:inline;
+                                " @onclick="(() => AddItem())">Add</a>
+                        }
+                        else
+                        {
+                            <a style="text-underline-position:below; cursor:not-allowed; color:lightgray; text-align:left">Add</a>
+
+                        }
+                    </td>
+                </tr>
+
+            </table>
+
+            <div style="width:inherit">
+                <ul class="nav flex-column" style="width:inherit">
+
+                    @if (listChoosed != null)
+                        @foreach (var item in listChoosed.ListItems)
+                        {
+                            <li class="p-1" style="width:inherit">
+
+                                <ListItemComponent DeleteItemEvent="(() => DeleteItem(item))"
+                                                   EditItemEvent="(() => EditItem(item))"
+                                                   EditListItemId="EditListItemId"
+                                                   item="@item"
+                                                   Permission="@listAggregatorChoosed.PermissionLevel"
+                                                   ListItemClickedEvent="(() => ListItemClicked(item))"
+                                                   ListItemDragStartEvent="(() => ListItemDragStart(item))"
+                                                   ListItemDropEvent="(() => ListItemDrop(item))"
+                                                   SaveItemEvent="(() => SaveItem(item))"
+                                                   ListItemDoubleClickedEvent="(() => ListItemDoubleClicked(item))"></ListItemComponent>
+
+                                @*@if (item.ListItemId != EditListItemId)
+                                    {
+                                        <div class="row">
+                                            <div class="col-10" ondragover="event.preventDefault();">
+                                                <button class="btn btn-block btn-light" style="align-content:flex-start" draggable="true" dropzone="can-drop"
+                                                        @onclick="(() => ListItemClicked(item))" @ondragstart="(() => ListItemDragStart(item))"
+                                                        @ondrop="(() => ListItemDrop(item))">
+                                                    <span class="oi oi-plus" aria-hidden="true"></span> @item.ListItemName
+
+                                                </button>
+                                            </div>
+                                            <div class="col-2">
+                                                <a style="text-underline-position:below; cursor:pointer; color:blue; text-align:left" @onclick="(() => EditItem(item))">Edit</a>
+                                                <a style="text-underline-position:below; cursor:pointer; color:blue; text-align:left" @onclick="(() => DeleteItem(item))">Delete</a>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <EditForm Model="item">
+                                            <div class="row>">
+                                                <div class="col-10">
+                                                    <InputText class="form-control col-3" @bind-Value="item.ListItemName" placeholder="email address" />
+                                                </div>
+                                                <div class="col-2">
+                                                    <a style="text-underline-position:below; cursor:pointer; color:blue; display:inline" @onclick="(() => SaveItem(item))">Save</a>
+                                                </div>
+                                            </div>
+
+                                        </EditForm>
+                                    }*@
+                            </li>
+                        }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@code {
+
+    EditContext AddListItemEditContext;
+    EditForm AddListItemEditForm;
+
+    ListItem AddListItem = new ListItem();
+    ListAggregator AddListAggregator = new ListAggregator { PermissionLevel = 1 };
+    List AddList = new List();
+
+    User data = null;
+    int EditListItemId = -1;
+    int EditListId = -1;
+    int EditListAggregatorId = -1;
+
+    public ListAggregator listAggregatorChoosed;
+    public List listChoosed;
+
+    // bool EditListItem = false;
+
+    string ReadOnlyInputField()
+    {
+
+        if (listAggregatorChoosed?.PermissionLevel >= 3)
+            return "readonly";
+        return "";
+
+    }
+
+    async Task ListItemDragOver(ListItem e)
+    {
+
+    }
+
+
+
+
+    async Task ListItemDrop(ListItem e)
+    {
+
+
+        var list = await LoadSaveOrderHelper.ChangeOrderItemsInList(e, listItemDragStart, listChoosed.ListItems
+            , shoppingListService.ChangeOrder<ListItem>);
+
+        listChoosed.ListItems = list;
+
+        await SaveAllOrder(data.ListAggregators);
+
+    }
+
+    async Task ListDrop(List e)
+    {
+
+        var list = await LoadSaveOrderHelper.ChangeOrderItemsInList(e, listDragStart, listAggregatorChoosed.Lists
+            , shoppingListService.ChangeOrder);
+
+        listAggregatorChoosed.Lists = list;
+
+
+
+        await SaveAllOrder(data.ListAggregators);
+
+    }
+
+
+
+    async Task ListAggregatorDrop(ListAggregator e)
+    {
+
+        var list = await LoadSaveOrderHelper.ChangeOrderItemsInList(e, listAggregatorDragStart, data.ListAggregators
+         , SaveListAggregatorsOrder);
+
+        data.ListAggregators = list;
+
+
+
+        await SaveAllOrder(data.ListAggregators);
+    }
+
+
+
+    async Task SaveListAggregatorsOrder(ICollection<ListAggregator> list)
+    {
+        var tempList = new List<OrderListAggrItem>();
+
+        list.ToList().ForEach(a => tempList.Add(new OrderListAggrItem { Id = a.ListAggregatorId, Order = a.Order }));
+
+        var user = await authenticationStateProvider.GetAuthenticationStateAsync();
+
+        await localStorage.SetItemAsync(user.User.Identity.Name, tempList);
+    }
+
+
+    async Task SaveAllOrder(ICollection<ListAggregator> list)
+    {
+        var tempAggrList = new List<OrderListAggrItem>();
+
+        list.ToList().ForEach(aggr =>
+        {
+
+            var itemAggr = new OrderListAggrItem { Id = aggr.ListAggregatorId, Order = aggr.Order };
+
+
+            aggr.Lists.ToList().ForEach(list =>
+            {
+                var itemList = new OrderListItem { Id = list.ListId, Order = list.Order };
+
+                list.ListItems.ToList().ForEach(item =>
+                {
+
+                    var itemItem = new OrderItem { Id = item.ListItemId, Order = item.Order };
+
+                    itemList.List.Add(itemItem);
+
+                });
+
+
+                itemAggr.List.Add(itemList);
+            });
+
+
+            tempAggrList.Add(itemAggr);
+
+        });
+
+        var user = await authenticationStateProvider.GetAuthenticationStateAsync();
+
+        await localStorage.SetItemAsync(user.User.Identity.Name, tempAggrList);
+    }
+
+
+
+
+
+
+    ListItem listItemDragStart;
+    async Task ListItemDragStart(ListItem e)
+    {
+        listItemDragStart = e;
+    }
+
+    List listDragStart;
+    async Task ListDragStart(List e)
+    {
+        listDragStart = e;
+    }
+
+    ListAggregator listAggregatorDragStart;
+    async Task ListAggregatorDragStart(ListAggregator e)
+    {
+        listAggregatorDragStart = e;
+    }
+
+    async Task ListAggregationClicked(ListAggregator e)
+    {
+
+        listChoosed = null;
+        listAggregatorChoosed = e;
+
+        var listId = await localStorage.GetItemAsync<int?>("ListId");
+
+        if (listId != null && listAggregatorChoosed.Lists.Any(a => a.ListId == listId))
+            listChoosed = listAggregatorChoosed.Lists.Single(a => a.ListId == listId);
+
+        listAggregatorChoosed.Lists = listAggregatorChoosed?.Lists.OrderByDescending(a => a.Order).ToList();
+
+
+        await localStorage.SetItemAsync("ListAggregatorId", e.ListAggregatorId);
+    }
+
+
+    async Task ListClicked(List e)
+    {
+        listChoosed = e;
+        listChoosed.ListItems = listChoosed?.ListItems.OrderByDescending(a => a.Order).ToList();
+
+        await localStorage.SetItemAsync("ListId", e.ListId);
+    }
+
+    void ListItemClicked(ListItem e)
+    {
+
+    }
+
+    async Task ListItemDoubleClicked(ListItem e)
+    {
+        if (e.State == ItemState.Normal)
+            e.State = ItemState.Buyed;
+        else
+            e.State = ItemState.Normal;
+
+        await shoppingListService.SaveItemProperty<ListItem>(e, nameof(ListItem.State), listAggregatorChoosed.ListAggregatorId);
+
+    }
+    void EditItem(ListItem e)
+    {
+        EditListItemId = e.ListItemId;
+
+    }
+
+    void EditList(List e)
+    {
+        EditListId = e.ListId;
+
+    }
+
+
+    void EditListAggregator(ListAggregator e)
+    {
+        EditListAggregatorId = e.ListAggregatorId;
+
+    }
+
+    async Task SaveItem(ListItem e)
+    {
+        EditListItemId = -1;
+
+        var listItem = await shoppingListService.EditItem<ListItem>(e, listAggregatorChoosed.ListAggregatorId);
+
+        e.ListItemName = listItem.ListItemName;
+    }
+
+    async Task SaveList(List e)
+    {
+        EditListId = -1;
+
+        var list = await shoppingListService.EditItem<List>(e, listAggregatorChoosed.ListAggregatorId);
+
+        e.ListName = list.ListName;
+    }
+
+    async Task SaveListAggregator(ListAggregator e)
+    {
+        EditListAggregatorId = -1;
+
+        var list = await shoppingListService.EditItem<ListAggregator>(e, listAggregatorChoosed.ListAggregatorId);
+
+        e.ListAggregatorName = list.ListAggregatorName;
+    }
+
+    async Task DeleteItem(ListItem e)
+    {
+        var amount = await shoppingListService.Delete<ListItem>(e.ListItemId, listAggregatorChoosed.ListAggregatorId);
+
+        if (amount > 0)
+        {
+            listChoosed.ListItems.Remove(e);
+        }
+    }
+
+    async Task DeleteList(List e)
+    {
+        var amount = await shoppingListService.Delete<List>(e.ListId, listAggregatorChoosed.ListAggregatorId);
+
+        if (amount > 0)
+        {
+            listAggregatorChoosed.Lists.Remove(e);
+        }
+
+        if (listChoosed == null || listChoosed.ListId == e.ListId)
+            listChoosed = null;
+    }
+
+    async Task DeleteListAggregator(ListAggregator e)
+    {
+        var amount = await shoppingListService.Delete<ListAggregator>(e.ListAggregatorId, e.ListAggregatorId);
+
+        if (amount > 0)
+        {
+            data.ListAggregators.Remove(e);
+        }
+
+        if (listAggregatorChoosed == null || listAggregatorChoosed.Id == e.ListAggregatorId)
+        {
+            listChoosed = null;
+            listAggregatorChoosed = null;
+        }
+    }
+
+    async Task AddItem()
+    {
+        //AddListItem.ListItemId = listChoosed.ListItems.Max(a => a.ListItemId) + 1;
+        //listChoosed.ListItems.Add(AddListItem);
+        //AddListItem = new ListItem();
+        if (listChoosed == null) return;
+
+        if (listChoosed.ListItems.Any())
+        {
+            AddListItem.Order = listChoosed.ListItems.Max(a => a.Order) + 1;
+        }
+        var newItem = await shoppingListService.AddItem<ListItem>(listChoosed.ListId, AddListItem, listAggregatorChoosed.ListAggregatorId);
+
+        listChoosed.ListItems.Add(newItem);
+        listChoosed.ListItems = listChoosed.ListItems.OrderByDescending(a => a.Order).ToList();
+
+        AddListItem.ListItemName = "";
+        AddListItemEditContext.MarkAsUnmodified();
+    }
+
+    async Task AddToList()
+    {
+        //AddListItem.ListItemId = listChoosed.ListItems.Max(a => a.ListItemId) + 1;
+        //listChoosed.ListItems.Add(AddListItem);
+        //AddListItem = new ListItem();
+
+        if (listAggregatorChoosed == null) return;
+
+        if (listAggregatorChoosed.Lists.Any())
+            AddList.Order = listAggregatorChoosed.Lists.Max(a => a.Order) + 1;
+
+
+        var newItem = await shoppingListService.AddItem<List>(listAggregatorChoosed.ListAggregatorId, AddList, listAggregatorChoosed.ListAggregatorId);
+
+        listAggregatorChoosed.Lists.Add(newItem);
+
+        listAggregatorChoosed.Lists = listAggregatorChoosed.Lists.OrderByDescending(a => a.Order).ToList();
+
+        //listChoosed = newItem;
+
+    }
+
+
+
+
+    async Task AddToListAggregator()
+    {
+
+
+        //if (data.ListAggregators.Any())
+        //    AddListAggregator.Order = data.ListAggregators.Max(a => a.Order) + 1;
+
+        var newItem = await shoppingListService.AddItem<ListAggregator>(data.UserId, AddListAggregator, -1);
+
+        if (data.ListAggregators.Any())
+            newItem.Order = data.ListAggregators.Max(a => a.Order) + 1;
+
+        data.ListAggregators.Add(newItem);
+
+        data.ListAggregators = data.ListAggregators.OrderByDescending(a => a.Order).ToList();
+
+        //listAggregatorChoosed = newItem;
+        //listChoosed = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+
+            try
+            {
+
+                var identity = await authenticationStateProvider.GetAuthenticationStateAsync();
+
+                var nameUser = identity.User.Identity.Name;
+
+                data = await userService.GetUserDataTreeObjectsgAsync(nameUser);
+
+
+            }
+
+            catch
+            {
+
+                ((ShoppingList_WebClient.Data.CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+
+                navigationManager.NavigateTo("/login");
+
+                return;
+            }
+
+
+
+            (listAggregatorChoosed, listChoosed) = await LoadSaveOrderHelper.LoadChoosedList(data, localStorage);
+
+            await LoadSaveOrderHelper.LoadListAggregatorsOrder(localStorage, data, authenticationStateProvider);
+
+            var dimension = await broserService.GetDimensions();
+            await BrowserHasResized(dimension.Width);
+            await JSRuntime.InvokeAsync<object>("SayHelloJS");
+
+            StateHasChanged();
+
+            try
+            {
+                await SignalRInitAsync();
+            }
+            catch(Exception ex) {
+
+                Console.WriteLine(ex);
+            }
+        }
+
+    }
+
+    protected override void OnInitialized()
+    {
+        AddListItemEditContext = new EditContext(AddListItem);
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
+
+
+        var user = authProvider.User.Identity.Name;
+
+        BrowserService.OnResize += BrowserHasResized;
+        await JSRuntime.InvokeAsync<object>("registerResizeCallback");
+
+
+        base.OnInitializedAsync();
+    }
+
+    string windowWidth;
+    string card = "";
+    string styleForContainer = "";
+    bool firstSmallWindowRender = true;
+
+
+    private async Task BrowserHasResized(int windowWidth)
+    {
+
+        // var resolution = await broserService.GetDimensions();
+
+
+        this.windowWidth = windowWidth.ToString();
+
+
+        if (windowWidth < 992)
+        {
+
+            if (firstSmallWindowRender)
+            {
+                firstSmallWindowRender = false;
+                await JSRuntime.InvokeAsync<object>("Collapse");
+
+            }
+
+            card = "card";
+            styleForContainer = "padding:0px; margin: 0px";
+
+        }
+        else
+        {
+
+            card = "";
+            styleForContainer = "";
+        }
+
+
+
+        StateHasChanged();
+    }
+
+    HubConnection _hubConnection;
+
+    void Accessor<T>(T value, Action<T> setter)
+    {
+        setter(value);
+    }
+
+    List<IDisposable> SignalRToDispose;
+
+    async Task SignalRInitAsync()
+    {
+
+
+        SignalRToDispose = SignalRHelper.SignalRShoppingListInitAsync(
+            data,
+            (a) => data = a,
+            (a) => listAggregatorChoosed = a,
+            (a) => listChoosed = a,
+           authenticationStateProvider, userService,
+           navigationManager, StateHasChanged,
+           shoppingListService,
+           localStorage);
+
+
+
+
+    }
+
+
+
+    public void Dispose()
+    {
+        BrowserService.OnResize -= BrowserHasResized;
+        SignalRToDispose?.ForEach(a => a?.Dispose());
+
+    }
+
+
+
+}
+
