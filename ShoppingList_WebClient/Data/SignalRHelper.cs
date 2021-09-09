@@ -142,7 +142,7 @@ namespace ShoppingList_WebClient.Data
 
                     ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
 
-                    navigationManager.NavigateTo("/login");
+                    navigationManager.NavigateTo("login");
 
                     return;
                 }
