@@ -64,7 +64,7 @@
 
             ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
                 .MarkUserAsAuthenticated(token);
-            NavigationManager.NavigateTo("/shoppinglist",true);
+            NavigationManager.NavigateTo("shoppinglist",true);
         }
 
 
@@ -93,7 +93,7 @@
                 if (message != null && message.Status == "OK")
                 {
                     ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(message.Message);
-                    NavigationManager.NavigateTo("/shoppinglist",true);
+                    NavigationManager.NavigateTo("shoppinglist",true);
                 }
                 else
                 {

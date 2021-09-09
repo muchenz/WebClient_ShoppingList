@@ -54,8 +54,8 @@ Welcome to your new app.
         var accessToken = await localStorageService.GetItemAsync<string>("accessToken");
 
         if (accessToken == null)
-            navigationManager.NavigateTo("/login");
+            navigationManager.NavigateTo("login");
         else
-            navigationManager.NavigateTo("/shoppinglist");
+            navigationManager.NavigateTo("shoppinglist");
     }
 }
