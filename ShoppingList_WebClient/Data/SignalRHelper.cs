@@ -19,7 +19,7 @@ namespace ShoppingList_WebClient.Data
 
         static HubConnection _hubConnection;
 
-        public static async Task SignalRInitAsync(IConfiguration configuration)
+        public static async Task SignalRInitAsync(IConfiguration configuration, UserInfoService userInfoService)
         {
             //_hubConnection = new HubConnectionBuilder().WithUrl("https://94.251.148.92:5013/chatHub", (opts) =>
             //{
@@ -40,6 +40,15 @@ namespace ShoppingList_WebClient.Data
             ).WithAutomaticReconnect().Build();
 
             await _hubConnection.StartAsync();
+
+            userInfoService.ClientSignalRID = _hubConnection.ConnectionId;
+
+            _hubConnection.Reconnected += (id) =>
+            {
+                userInfoService.ClientSignalRID = id;
+                return Task.CompletedTask;
+            };
+
             Console.WriteLine($"SingnalR state: {_hubConnection.State}");
         }
 

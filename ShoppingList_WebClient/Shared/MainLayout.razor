@@ -2,8 +2,10 @@
 
 @using Blazored.Toast.Configuration
 @using Microsoft.Extensions.Configuration;
+@using Services;
 
 @inject IConfiguration configuration
+@inject UserInfoService _userInfoService
 
 <BlazoredModal />
 <BlazoredToasts Position="ToastPosition.BottomRight"
@@ -36,7 +38,7 @@
     {
 
 
-        await Data.SignalRHelper.SignalRInitAsync(configuration);
+        await Data.SignalRHelper.SignalRInitAsync(configuration, _userInfoService);
 
     }
 }

@@ -21,14 +21,15 @@ namespace ShoppingList_WebClient.Services
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
+        private readonly UserInfoService _userInfoService;
 
-        public UserService(HttpClient httpClient, IConfiguration configuration, ILocalStorageService localStorage)
+        public UserService(HttpClient httpClient, IConfiguration configuration, ILocalStorageService localStorage
+            , UserInfoService userInfoService)
         {
             _httpClient = httpClient;
             _configuration = configuration;// new ConfigMock();
             _localStorage = localStorage;
-
-
+            _userInfoService = userInfoService;
             var apiAddress = _configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"];
 
             _httpClient.BaseAddress = new Uri(apiAddress);
@@ -39,7 +40,6 @@ namespace ShoppingList_WebClient.Services
         string token;
         private async Task SetRequestBearerAuthorizationHeader(HttpRequestMessage httpRequestMessage)
         {
-
             token = await _localStorage.GetItemAsync<string>("accessToken");
 
             if (token != null)
@@ -49,6 +49,9 @@ namespace ShoppingList_WebClient.Services
                     = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
                 // _httpClient.DefaultRequestHeaders.Add("Authorization", $"bearer  {token}");
             }
+
+
+            httpRequestMessage.Headers.Add("SignalRId", _userInfoService.ClientSignalRID);
 
             await Task.CompletedTask;
         }

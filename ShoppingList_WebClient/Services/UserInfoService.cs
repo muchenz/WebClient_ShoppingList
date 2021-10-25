@@ -8,5 +8,6 @@ namespace ShoppingList_WebClient.Services
     public class UserInfoService
     {
          public string Token { get; set; }
+         public string ClientSignalRID { get; set; }
     }
 }
