@@ -17,10 +17,10 @@ namespace ShoppingList_WebClient.Services
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
-        private readonly UserInfoService _userInfoService;
+        private readonly StateInfoService _userInfoService;
 
         public ShoppingListService(HttpClient httpClient, IConfiguration configuration, ILocalStorageService localStorage
-            ,UserInfoService userInfoService)
+            ,StateInfoService userInfoService)
         {
             _httpClient = httpClient;
             _configuration = configuration;

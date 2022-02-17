@@ -1,6 +1,6 @@
 ﻿@using ShoppingList_WebClient.Models
 
-@inject IModalService Modal
+@*@inject IModalService Modal*@
 
 @if (GetItemId() != EditListItemId)
 {
@@ -78,6 +78,8 @@ else
         </EditForm>*@
 }
 @code{
+    [CascadingParameter] public IModalService Modal { get; set; }
+
     [Parameter] public IModelItemView item { get; set; }
     [Parameter] public int? ChoosedItemId { get; set; }
     [Parameter] public int? Permission { get; set; }
@@ -150,15 +152,22 @@ else
         var param = new ModalParameters();
         param.Add("Name", item.Name);
         param.Add("FullInfo", true);
+        param.Add("DeleteFunction", new Action(ModalDeleleteNoParam));
 
+        //Modal.OnClose += ModalDelelete;
 
-        Modal.OnClose += ModalDelelete;
-
-
+        
         Modal.Show<ModalDelete>("Delete", param);
 
 
     }
+
+    async void ModalDeleleteNoParam()
+    {
+
+            await DeleteItemEvent.InvokeAsync(item);
+    }
+
 
     async void ModalDelelete(ModalResult res)
     {
@@ -168,7 +177,7 @@ else
             await DeleteItemEvent.InvokeAsync(item);
 
         }
-        Modal.OnClose -= ModalDelelete;
+        //Modal.OnClose -= ModalDelelete;
     }
 
     async Task SaveItem(IModelItemView item) => await SaveItemEvent.InvokeAsync(item);

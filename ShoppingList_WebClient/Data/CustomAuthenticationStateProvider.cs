@@ -12,13 +12,13 @@ namespace ShoppingList_WebClient.Data
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly UserInfoService _userInfoService;
+        private readonly StateInfoService _userInfoService;
 
         public ILocalStorageService _localStorageService { get; }
         public UserService _userService { get; set; }
 
         public CustomAuthenticationStateProvider(ILocalStorageService localStorageService,
-            UserService userService, UserInfoService userInfoService)
+            UserService userService, StateInfoService userInfoService)
         {
             //throw new Exception("CustomAuthenticationStateProviderException");
             _localStorageService = localStorageService;

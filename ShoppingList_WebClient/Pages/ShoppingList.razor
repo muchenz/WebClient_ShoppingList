@@ -16,6 +16,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager navigationManager
 @inject IConfiguration configuration
+@inject StateInfoService stateInfoService
 
 <div class="row d-lg-none" style="margin-bottom:15px">
     <div class="col">
@@ -646,9 +647,10 @@
 
             try
             {
-                await SignalRInitAsync();
+                stateInfoService.HubState.JoinToHub(SignalRInit);
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
 
                 Console.WriteLine(ex);
             }
@@ -673,7 +675,7 @@
         await JSRuntime.InvokeAsync<object>("registerResizeCallback");
 
 
-        base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
     string windowWidth;
@@ -726,9 +728,8 @@
 
     List<IDisposable> SignalRToDispose;
 
-    async Task SignalRInitAsync()
+    void  SignalRInit(HubConnection _)
     {
-
 
         SignalRToDispose = SignalRHelper.SignalRShoppingListInitAsync(
             data,
@@ -739,9 +740,6 @@
            navigationManager, StateHasChanged,
            shoppingListService,
            localStorage);
-
-
-
 
     }
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using ShoppingList_WebClient.Data;
 using ShoppingList_WebClient.Models;
 using ShoppingList_WebClient.Services;
@@ -19,27 +20,31 @@ namespace ShoppingList_WebClient.Data
 
         static HubConnection _hubConnection;
 
-        public static async Task SignalRInitAsync(IConfiguration configuration, UserInfoService userInfoService)
+        public static async Task SignalRInitAsync(IConfiguration configuration, StateInfoService userInfoService)
         {
-            //_hubConnection = new HubConnectionBuilder().WithUrl("https://94.251.148.92:5013/chatHub", (opts) =>
-            //{
-            //_hubConnection = new HubConnectionBuilder().WithUrl("https://192.168.8.222:91/chatHub", (opts) =>
-            //{
             _hubConnection = new HubConnectionBuilder().WithUrl(configuration.GetSection("AppSettings")["SignlRAddress"]
-            //    ,(opts) =>
-            //{
-            //    opts.HttpMessageHandlerFactory = (message) =>
-            //    {
-            //        if (message is HttpClientHandler clientHandler)
-            //            // bypass SSL certificate
-            //            clientHandler.ServerCertificateCustomValidationCallback +=
-            //                      (sender, certificate, chain, sslPolicyErrors) => { return true; };
-            //        return message;
-            //    };
-            //}
-            ).WithAutomaticReconnect().Build();
+                ,(opts) =>
+            {
+                opts.Headers.Add("Access_Token", userInfoService.Token);
+             
+                //Console.WriteLine($"tttttttttttoooooooooooooken_________: { userInfoService.Token}");
 
+                //    opts.HttpMessageHandlerFactory = (message) =>
+                //    {
+                //        if (message is HttpClientHandler clientHandler)
+                //            // bypass SSL certificate
+                //            clientHandler.ServerCertificateCustomValidationCallback +=
+                //                      (sender, certificate, chain, sslPolicyErrors) => { return true; };
+                //        return message;
+                //    };
+            }
+            ).WithAutomaticReconnect().Build();
+            
             await _hubConnection.StartAsync();
+           
+            //Console.WriteLine($"tttttttttttoooooooooooooken: { userInfoService.Token}");
+            
+            userInfoService.HubState.CallHuBReady(_hubConnection);
 
             userInfoService.ClientSignalRID = _hubConnection.ConnectionId;
 

@@ -7,7 +7,7 @@
 @inject UserService userService
 @inject ShoppingListService shoppingListService
 @inject ILocalStorageService localStorage
-@inject IModalService Modal
+@*@inject IModalService Modal*@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject BrowserService broserService
 @inject IJSRuntime JSRuntime
@@ -208,6 +208,7 @@
 
     UserPermissionToListAggregation addEditUser = new UserPermissionToListAggregation { Permission = 2, User = new User() };
 
+    [CascadingParameter] public IModalService Modal { get; set; }
 
     async void ModalQuestion(ModalResult res)
     {
@@ -236,7 +237,7 @@
             StateHasChanged();
         }
 
-        Modal.OnClose -= ModalQuestion;
+        //Modal.OnClose -= ModalQuestion;
     }
 
     int permissionWantToChange;
@@ -258,10 +259,12 @@
             paramQ.Add("Warning", true);
 
 
-            Modal.OnClose += ModalQuestion;
+            //Modal.OnClose += ModalQuestion;
 
 
-            Modal.Show<ModalInfoQuestion>("Warning!", paramQ);
+            var res = Modal.Show<ModalInfoQuestion>("Warning!", paramQ);
+
+            ModalQuestion(await res.Result);
 
             return;
         }
@@ -286,8 +289,14 @@
         }
 
         param.Add("Info", info);
+        var options = new ModalOptions()
+        {
+            DisableBackgroundCancel = true,
+            FocusFirstElement=false
+        };
 
-        Modal.Show<ModalInfo>("Information", param);
+
+        Modal.Show<ModalInfo>("Information", param, options);
     }
 
     async Task DeleteToListAggregator(UserPermissionToListAggregation item)
@@ -388,8 +397,6 @@
         param.Add("Name", item.User.EmailAddress);
 
 
-        Modal.OnClose += ModalDelelete;
-
 
         if (item.User.EmailAddress == user.User.Identity.Name)
         {
@@ -397,6 +404,7 @@
             paramQ.Add("Line1", "You are delete yours permission!");
             paramQ.Add("Line2", "Are you sure?");
             paramQ.Add("Warning", true);
+            paramQ.Add("Function", new Action(ModalDelelete));
 
             Modal.Show<ModalInfoQuestion>("Warning!", paramQ);
         }
@@ -411,11 +419,8 @@
     UserPermissionToListAggregation itemClicked;
 
 
-    async void ModalDelelete(ModalResult res)
+    async void ModalDelelete()
     {
-
-        if (res.Data != null && (bool)res.Data)
-        {
             var info = await userService.DeleteUserPermission(itemClicked, chosedListAggrId);
 
 
@@ -423,9 +428,6 @@
             param.Add("Info", info);
 
             Modal.Show<ModalInfo>("Information", param);
-
-        }
-        Modal.OnClose -= ModalDelelete;
     }
 
 
@@ -434,7 +436,8 @@
     string styleForContainer = "";
     bool firstSmallWindowRender = true;
 
-    RenderFragment tabele =@<tr></tr>;
+    RenderFragment tabele =
+    @<tr></tr>;
 
 private async Task BrowserHasResized(int windowWidth)
 {

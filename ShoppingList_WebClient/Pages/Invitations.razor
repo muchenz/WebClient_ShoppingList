@@ -9,14 +9,16 @@
 @using Models
 @using Blazored.LocalStorage;
 @using Microsoft.Extensions.Logging
+@using Microsoft.AspNetCore.SignalR.Client;
 
 @inject UserService userService
 @inject ShoppingListService shoppingListService
 @inject ILocalStorageService localStorage
-@inject IModalService Modal
+@*@inject IModalService Modal*@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject ILogger<Invitations> _logger
+@inject StateInfoService stateInfoService
 
 <h3>Invitations1</h3>
 
@@ -77,7 +79,7 @@
 
 @code {
     List<Invitation> invitationsList;
-
+    [CascadingParameter] public IModalService Modal { get; set; }
     async Task LoadInvitationList()
     {
         _logger.LogError("alla");
@@ -94,7 +96,7 @@
             _logger.LogError("alla2", userId);
 
             if (userId != null)
-                await SignalRInitAsync(int.Parse(userId));
+                SignalRInit(int.Parse(userId));
         }
         catch
         {
@@ -114,24 +116,26 @@
             await LoadInvitationList();
             StateHasChanged();
 
-
         }
 
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async Task SignalRInitAsync(int userId)
+    void SignalRInit(int userId)
     {
+        async Task SignalRInitAsync(HubConnection _)
+        {
 
+            SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
+                    userId,
+                    authenticationStateProvider,
+                    userService,
+                    (a) => invitationsList = a,
+                    (_) => { },
+                    StateHasChanged);
+        }
 
-        SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
-       userId,
-        authenticationStateProvider,
-        userService,
-        (a) => invitationsList = a,
-        (_) => { },
-        StateHasChanged);
-
+        stateInfoService.HubState.JoinToHub(SignalRInitAsync);
     }
 
     public async Task AcceptInvitation(Invitation item)

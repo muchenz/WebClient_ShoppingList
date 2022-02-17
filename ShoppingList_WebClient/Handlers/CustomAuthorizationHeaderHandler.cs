@@ -10,10 +10,10 @@ namespace ShoppingList_WebClient.Handlers
 {
     public class CustomAuthorizationHeaderHandler : DelegatingHandler
     {
-        private readonly UserInfoService _userInfoService;
+        private readonly StateInfoService _userInfoService;
         private readonly ILocalStorageService _localStorageService;
 
-        public CustomAuthorizationHeaderHandler(UserInfoService userInfoService, ILocalStorageService localStorageService)
+        public CustomAuthorizationHeaderHandler(StateInfoService userInfoService, ILocalStorageService localStorageService)
         {
             _userInfoService = userInfoService;
             _localStorageService = localStorageService;

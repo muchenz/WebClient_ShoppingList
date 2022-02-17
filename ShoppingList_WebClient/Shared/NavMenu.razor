@@ -3,10 +3,12 @@
 @using Services
 @using Data
 @using System.Security.Claims;
+@using Microsoft.AspNetCore.SignalR.Client;
 
 
 @inject UserService userService
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject StateInfoService stateInfoService
 
 
 <div class="top-row pl-4 navbar navbar-dark">
@@ -77,9 +79,9 @@
             authProvider.User.Claims.ToList().ForEach(a => Console.WriteLine($"claims {a.Type}, value {a.Value}"));
 
             if (userId != null)
-                await SignalRInitAsync(int.Parse(userId));
+                SignalRInit(int.Parse(userId));
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine($"{ex}");
 
@@ -95,17 +97,22 @@
 
     int NuberOfInvitations;
 
-    async Task SignalRInitAsync(int userId)
+    void SignalRInit(int userId)
     {
+        async Task SignalRInitAsync(HubConnection _)
+        {
 
 
-        SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
-       userId,
-        authenticationStateProvider,
-        userService,
-        (_) => { },
-        (a) => NuberOfInvitations = a,
-        StateHasChanged);
+            SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
+                            userId,
+                            authenticationStateProvider,
+                            userService,
+                            (_) => { },
+                            (a) => NuberOfInvitations = a,
+                            StateHasChanged);
+        }
+
+        stateInfoService.HubState.JoinToHub(SignalRInitAsync);
 
     }
 

@@ -1,6 +1,4 @@
-﻿@inject IModalService ModalService
-
-<div class="simple-form">
+﻿<div class="simple-form">
 
     <div class="form-group">
         <label class="@_warningStyle" for="movie-name">Ale you sure to delete '@Name'?</label>
@@ -17,17 +15,26 @@
 @code {
 
     [CascadingParameter] ModalParameters Parameters { get; set; }
+    [CascadingParameter] BlazoredModalInstance modalInstance { get; set; }
 
-    string Name { get; set; }
-    bool FullInfo { get; set; }
-    bool Warning { get; set; }
+    //string Name { get; set; }
+    //bool FullInfo { get; set; }
+    //bool Warning { get; set; }
+    //Action DeleteFunction { get; set; }  
+    [Parameter] public  string Name { get; set; }
+    [Parameter] public  bool FullInfo { get; set; }
+    [Parameter] public  bool Warning { get; set; }
+    [Parameter] public  Action DeleteFunction { get; set; }
+
     protected override void OnInitialized()
     {
 
 
-        Name = Parameters.Get<string>("Name");
-        FullInfo = Parameters.TryGet<bool>("FullInfo");
-        Warning = Parameters.TryGet<bool>("Warning");
+        //Name = Parameters.Get<string>("Name");
+        //FullInfo = Parameters.TryGet<bool>("FullInfo");
+        //Warning = Parameters.TryGet<bool>("Warning");
+        //DeleteFunction = Parameters.TryGet<Action>("DeleteFunction");
+
     }
 
     string _warningStyle
@@ -51,12 +58,14 @@
     void OK()
     {
 
-        ModalService.Close(ModalResult.Ok<bool>(true));
+        //ModalService.Close(ModalResult.Ok<bool>(true));
+        DeleteFunction?.Invoke();
+        modalInstance.CloseAsync(ModalResult.Ok<bool>(true));
     }
 
     void Cancel()
     {
-        ModalService.Cancel();
+        modalInstance.CancelAsync();
     }
 
 }

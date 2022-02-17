@@ -1,6 +1,4 @@
-﻿@inject IModalService ModalService
-
-<div class="simple-form">
+﻿<div class="simple-form">
 
     <div class="form-group">
         <label for="movie-name">@Info</label>
@@ -13,23 +11,24 @@
 
 @code {
 
-    [CascadingParameter] ModalParameters Parameters { get; set; }
-
-    string Info { get; set; }
+    //[CascadingParameter] ModalParameters Parameters { get; set; }
+    [CascadingParameter] BlazoredModalInstance modalInstance { get; set; }
+    [Parameter] public string Info { get; set; }
 
     protected override void OnInitialized()
     {
 
 
-        Info = Parameters.Get<string>("Info");
+        //Info = Parameters.Get<string>("Info");
     }
-    
+
 
 
     void OK()
     {
 
-        ModalService.Close();
+        //ModalService.Close();
+        modalInstance.CloseAsync();
     }
 
 }

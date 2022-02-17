@@ -3,11 +3,12 @@
 @using Blazored.Toast.Configuration
 @using Microsoft.Extensions.Configuration;
 @using Services;
+@using ShoppingList_WebClient.Data
 
 @inject IConfiguration configuration
-@inject UserInfoService _userInfoService
+@inject StateInfoService _userInfoService
+@inject AuthenticationStateProvider authenticationStateProvider
 
-<BlazoredModal />
 <BlazoredToasts Position="ToastPosition.BottomRight"
                 Timeout="3"
                 IconType="IconType.FontAwesome"
@@ -37,8 +38,18 @@
     protected override async Task OnInitializedAsync()
     {
 
+        _userInfoService.NewTokenLoadedEvent += TokenLoaded;
+
+
+    }
+
+    async void TokenLoaded(string token)
+    {
 
         await Data.SignalRHelper.SignalRInitAsync(configuration, _userInfoService);
 
+
     }
+
+
 }
