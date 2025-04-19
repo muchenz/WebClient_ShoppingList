@@ -415,7 +415,7 @@
 
     async Task ListAggregationClicked(ListAggregator e)
     {
-
+        await SaveAllOrder(data.ListAggregators);
         listChoosed = null;
         listAggregatorChoosed = e;
 
@@ -433,6 +433,7 @@
 
     async Task ListClicked(List e)
     {
+        await SaveAllOrder(data.ListAggregators);
         listChoosed = e;
         listChoosed.ListItems = listChoosed?.ListItems.OrderByDescending(a => a.Order).ToList();
 
@@ -557,6 +558,7 @@
 
         AddListItem.ListItemName = "";
         AddListItemEditContext.MarkAsUnmodified();
+        await SaveAllOrder(data.ListAggregators);
     }
 
     async Task AddToList()
@@ -578,6 +580,7 @@
         listAggregatorChoosed.Lists = listAggregatorChoosed.Lists.OrderByDescending(a => a.Order).ToList();
 
         //listChoosed = newItem;
+        await SaveAllOrder(data.ListAggregators);
 
     }
 
@@ -602,6 +605,7 @@
 
         //listAggregatorChoosed = newItem;
         //listChoosed = null;
+        await SaveAllOrder(data.ListAggregators);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

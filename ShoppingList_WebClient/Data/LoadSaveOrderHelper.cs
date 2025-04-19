@@ -156,8 +156,8 @@ namespace ShoppingList_WebClient.Data
             }
 
         }
-        public static async Task<ICollection<T>> ChangeOrderItemsInList<T>(T dropItem, T dragItem,
-       ICollection<T> choosedList, Func<List<T>, Task> function) where T : IModelItem
+        public static async Task<IList<T>> ChangeOrderItemsInList<T>(T dropItem, T dragItem,
+       IList<T> choosedList, Func<List<T>, Task> function) where T : IModelItem
         {
 
             List<T> listOfListItemsToChange = null;

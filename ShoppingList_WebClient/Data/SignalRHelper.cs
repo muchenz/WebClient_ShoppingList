@@ -206,7 +206,7 @@ namespace ShoppingList_WebClient.Data
 
 
                         data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault().
-                       Lists.Where(a => a.ListId == parentId).FirstOrDefault().ListItems.Add(item);
+                       Lists.Where(a => a.ListId == parentId).FirstOrDefault().ListItems.Insert(0,item);
 
                         StateHasChanged();
                     }

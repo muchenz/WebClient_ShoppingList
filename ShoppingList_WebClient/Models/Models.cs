@@ -120,7 +120,7 @@ namespace ShoppingList_WebClient.Models
 
         public User()
         {
-            ListAggregators = new HashSet<ListAggregator>();
+            ListAggregators = new List<ListAggregator>();
 
 
         }
@@ -130,7 +130,7 @@ namespace ShoppingList_WebClient.Models
         // public string Password { get; set; }
 
         public byte LoginType { get; set; } // 1 - local 2 - facebook ()
-        public ICollection<ListAggregator> ListAggregators { get; set; }
+        public IList<ListAggregator> ListAggregators { get; set; }
 
 
     }
@@ -143,7 +143,7 @@ namespace ShoppingList_WebClient.Models
 
         public ListAggregator()
         {
-            Lists = new HashSet<List>();
+            Lists = new List<List>();
 
         }
         public int PermissionLevel { get; set; }
@@ -158,7 +158,7 @@ namespace ShoppingList_WebClient.Models
 
         public int Id => ListAggregatorId;
 
-        public ICollection<List> Lists { get; set; }
+        public IList<List> Lists { get; set; }
 
     }
 
@@ -205,7 +205,7 @@ namespace ShoppingList_WebClient.Models
     {
         public List()
         {
-            ListItems = new HashSet<ListItem>();
+            ListItems = new List<ListItem>();
 
         }
         public int ListId { get; set; }
@@ -217,7 +217,7 @@ namespace ShoppingList_WebClient.Models
             get { return ListName; }
             set { ListName = value; }
         }
-        public ICollection<ListItem> ListItems { get; set; }
+        public IList<ListItem> ListItems { get; set; }
 
     }
 
