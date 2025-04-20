@@ -52,7 +52,7 @@ namespace ShoppingList_WebClient.Data
             if (data == null || data.ListAggregators == null || !data.ListAggregators.Any()) return;
 
 
-            SetEntryOrder(data.ListAggregators);
+            SetEntryOrder2(data.ListAggregators);
 
 
             var tempListFromFile = await localStorage.GetItemAsync<List<OrderListAggrItem>>(user.User.Identity.Name);
@@ -75,7 +75,7 @@ namespace ShoppingList_WebClient.Data
 
 
                 ////////////////////
-                SetEntryOrder(listAggr.Lists);
+                SetEntryOrder2(listAggr.Lists);
 
 
                 foreach (var listList in listAggr.Lists)
@@ -91,7 +91,7 @@ namespace ShoppingList_WebClient.Data
                     }
 
 
-                    SetEntryOrder(listList.ListItems);
+                    SetEntryOrder2(listList.ListItems);
 
 
                     foreach (var listItem in listList.ListItems)
@@ -143,7 +143,18 @@ namespace ShoppingList_WebClient.Data
             }
         }
 
-        static void ResolveDoubleOrderValue(IEnumerable<IModelItemOrder> list)
+        static void SetEntryOrder2(IEnumerable<IModelItemOrder> list)
+        {
+            int i = 1;
+            foreach (var item in list)
+            {
+
+                item.Order = item.Id;
+            }
+        }
+
+
+            static void ResolveDoubleOrderValue(IEnumerable<IModelItemOrder> list)
         {
             foreach (var item in list)
             {
