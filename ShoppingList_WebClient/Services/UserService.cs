@@ -101,13 +101,21 @@ namespace ShoppingList_WebClient.Services
 
             requestMessage.Content.Headers.ContentType
                 = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+            MessageAndStatus message =null;
 
+            try
+            {
 
-            var response = await _httpClient.SendAsync(requestMessage);
+                var response = await _httpClient.SendAsync(requestMessage);
 
-            var token = await response.Content.ReadAsStringAsync();
+                var token = await response.Content.ReadAsStringAsync();
 
-            var message = JsonConvert.DeserializeObject<MessageAndStatus>(token);
+                 message = JsonConvert.DeserializeObject<MessageAndStatus>(token);
+            }
+            catch (Exception ex) { 
+            
+            
+            }
 
 
             return await Task.FromResult(message);
@@ -149,7 +157,7 @@ namespace ShoppingList_WebClient.Services
             querry.Add("userName", userName);
             // querry.Add("password", password);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "User/GetListAggregationForPermission" + querry.ToString());
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Permissions/GetListAggregationForPermission" + querry.ToString());
 
 
             await SetRequestBearerAuthorizationHeader(requestMessage);
@@ -218,7 +226,7 @@ namespace ShoppingList_WebClient.Services
 
             string serializedUser = JsonConvert.SerializeObject(userPermissionToList);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "User/" + actionName + querry.ToString());
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Permissions/" + actionName + querry.ToString());
 
 
             requestMessage.Content = new StringContent(serializedUser);
