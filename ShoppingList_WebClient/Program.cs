@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using Blazored.Modal;
 using Blazored.Toast;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -11,8 +12,10 @@ using ShoppingList_WebClient.Handlers;
 using ShoppingList_WebClient.Services;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ShoppingList_WebClient
@@ -45,7 +48,7 @@ namespace ShoppingList_WebClient
                 // handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
 
                 return handler;
-            });//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>();
+            }).AddHttpMessageHandler<AuthRedirectHandler>();//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>();
 
             builder.Services.AddHttpClient<ShoppingListService>(client => {
                 // code to configure headers etc..
@@ -55,7 +58,7 @@ namespace ShoppingList_WebClient
                 //  handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
 
                 return handler;
-            });//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>(); 
+            }).AddHttpMessageHandler<AuthRedirectHandler>();//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>(); 
 
 
             var address = new Uri( new ConfigMock().GetSection("")["ShoppingWebAPIBaseAddress"]);
@@ -74,6 +77,7 @@ namespace ShoppingList_WebClient
 
 
             builder.Services.AddScoped<BrowserService>();
+            builder.Services.AddScoped<AuthRedirectHandler>();
 
             builder.Services.AddBlazoredModal();
             builder.Services.AddBlazoredLocalStorage();
@@ -86,5 +90,27 @@ namespace ShoppingList_WebClient
 
             await builder.Build().RunAsync();
         }
+    }
+}
+
+public class AuthRedirectHandler : DelegatingHandler
+{
+    private readonly NavigationManager _navigation;
+
+    public AuthRedirectHandler(NavigationManager navigation)
+    {
+        _navigation = navigation;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var response = await base.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _navigation.NavigateTo("/login", forceLoad: true);
+        }
+
+        return response;
     }
 }

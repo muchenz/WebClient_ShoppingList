@@ -101,21 +101,15 @@ namespace ShoppingList_WebClient.Services
 
             requestMessage.Content.Headers.ContentType
                 = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            MessageAndStatus message =null;
+            MessageAndStatus message = null;
 
-            try
-            {
 
-                var response = await _httpClient.SendAsync(requestMessage);
 
-                var token = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.SendAsync(requestMessage);
 
-                 message = JsonConvert.DeserializeObject<MessageAndStatus>(token);
-            }
-            catch (Exception ex) { 
-            
-            
-            }
+            var token = await response.Content.ReadAsStringAsync();
+
+            message = JsonConvert.DeserializeObject<MessageAndStatus>(token);
 
 
             return await Task.FromResult(message);
@@ -138,9 +132,9 @@ namespace ShoppingList_WebClient.Services
             Console.WriteLine("!_______header " + requestMessage.Headers.Authorization.ToString());
 
             var response = await _httpClient.SendAsync(requestMessage);
-             // var response =  await  _httpClient.PostAsync("User/GetUserDataTree" + querry.ToString(),
-             //     new StringContent("", Encoding.UTF8, "application/json"));
-          //var response = await _httpClient.PostAsJsonAsync<string>("User/GetUserDataTree" + querry.ToString(), "");
+            // var response =  await  _httpClient.PostAsync("User/GetUserDataTree" + querry.ToString(),
+            //     new StringContent("", Encoding.UTF8, "application/json"));
+            //var response = await _httpClient.PostAsJsonAsync<string>("User/GetUserDataTree" + querry.ToString(), "");
 
             var data = await response.Content.ReadAsStringAsync();
 
