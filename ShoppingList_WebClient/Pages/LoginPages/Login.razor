@@ -92,9 +92,9 @@
 
 
 
-                if (message != null && message.Status == "OK")
+                if (!message.IsError)
                 {
-                    ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(message.Message);
+                    ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(message.Data.Token);
                     NavigationManager.NavigateTo("shoppinglist", true);
                 }
                 else

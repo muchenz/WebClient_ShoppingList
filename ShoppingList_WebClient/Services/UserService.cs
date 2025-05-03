@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Net.Http.Json;
+using ShoppingList_WebClient.Models.Requests;
+using ShoppingList_WebClient.Models.Response;
 
 namespace ShoppingList_WebClient.Services
 {
@@ -86,33 +88,35 @@ namespace ShoppingList_WebClient.Services
         }
 
 
-        public async Task<MessageAndStatus> LoginAsync(string userName, string password)
+        public async Task<MessageAndStatusAndData<UserNameAndTokenResponse>> LoginAsync(string userName, string password)
         {
+            var loginRequest = new LoginRequest
+            {
+                UserName = userName,
+                Password = password
+            };
 
-            var querry = new QueryBuilder();
-            querry.Add("userName", userName);
-            querry.Add("password", password);
+            var json = JsonConvert.SerializeObject(loginRequest);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "User/Login" + querry.ToString());
-
-            // await SetRequestBearerAuthorizationHeader(requestMessage);
-
-            requestMessage.Content = new StringContent("");
-
-            requestMessage.Content.Headers.ContentType
-                = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-            MessageAndStatus message = null;
-
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "User/Login")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
 
 
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var token = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                return MessageAndStatusAndData<UserNameAndTokenResponse>.Fail("Invalid username or password.");
+            }
 
-            message = JsonConvert.DeserializeObject<MessageAndStatus>(token);
+            var content = await response.Content.ReadAsStringAsync();
+
+            var tokenAndUsername = JsonConvert.DeserializeObject<UserNameAndTokenResponse>(content);
 
 
-            return await Task.FromResult(message);
+            return MessageAndStatusAndData<UserNameAndTokenResponse>.Ok(tokenAndUsername);
 
         }
 

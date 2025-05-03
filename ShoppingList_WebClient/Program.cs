@@ -106,7 +106,8 @@ public class AuthRedirectHandler : DelegatingHandler
     {
         var response = await base.SendAsync(request, cancellationToken);
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                !request.RequestUri.AbsolutePath.Contains("user/login", StringComparison.OrdinalIgnoreCase))
         {
             _navigation.NavigateTo("/login", forceLoad: true);
         }
