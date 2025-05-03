@@ -1,4 +1,4 @@
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Blazored.Modal;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Components;
@@ -109,7 +109,11 @@ public class AuthRedirectHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.Unauthorized &&
                 !request.RequestUri.AbsolutePath.Contains("user/login", StringComparison.OrdinalIgnoreCase))
         {
-            _navigation.NavigateTo("/login", forceLoad: true);
+            throw new UnauthorizedAccessException();
+
+
+            //nie działa: 
+            //_navigation.NavigateTo("/login", forceLoad: true);
         }
 
         return response;

@@ -3,13 +3,22 @@
 
 @inject IToastService _toastService
 
-@*@inject IWebHostEnvironment _webHostEnvironment*@
+@inject NavigationManager navigationManager
 
+<ErrorBoundary>
+    <ChildContent>
 
-<CascadingValue Value=this>
-    @ChildContent
-</CascadingValue>
+        <CascadingValue Value=this>
+            @ChildContent
+        </CascadingValue>
+    </ChildContent>
+    <ErrorContent>
+        @{
 
+            navigationManager.NavigateTo("/", true);
+        }
+    </ErrorContent>
+</ErrorBoundary>
 @code
 {
 
