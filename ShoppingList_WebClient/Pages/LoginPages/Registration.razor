@@ -70,10 +70,10 @@
         //assume that user is valid
         //call an API
 
-        string token = null;
+        MessageAndStatusAndData<string> response = null;
         try
         {
-            token = await userService.RegisterAsync(registrationrModel);
+            response = await userService.RegisterAsync(registrationrModel);
         }
         catch(Exception ex)
         {
@@ -81,14 +81,14 @@
         }
 
 
-        if (!string.IsNullOrEmpty(token))
+        if (!response.IsError)
         {
-            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
+            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(response.Data);
              NavigationManager.NavigateTo("index");
         }
         else
         {
-            LoginMesssage = "Some Errors";
+            LoginMesssage = response.Message;
         }
 
         return await Task.FromResult(true);
