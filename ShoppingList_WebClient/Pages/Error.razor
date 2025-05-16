@@ -1,9 +1,13 @@
-﻿@*@using Microsoft.AspNetCore.Hosting*@
+﻿@using Blazored.LocalStorage
+@using ShoppingList_WebClient.Data
+@*@using Microsoft.AspNetCore.Hosting*@
 @*@using Microsoft.Extensions.Hosting*@
 
 @inject IToastService _toastService
 
 @inject NavigationManager navigationManager
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <ErrorBoundary>
     <ChildContent>
@@ -14,7 +18,6 @@
     </ChildContent>
     <ErrorContent>
         @{
-
             navigationManager.NavigateTo("/", true);
         }
     </ErrorContent>
@@ -34,4 +37,16 @@
 
     }
 
+    public void ProcessExceptionAsync(Exception ex)
+    {
+
+        if (ex is HttpRequestException e && e.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            //await localStorage.RemoveItemAsync("accessToken");
+
+            ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+
+            _toastService.ShowError("Authentication problem.");
+        }
+    }
 }

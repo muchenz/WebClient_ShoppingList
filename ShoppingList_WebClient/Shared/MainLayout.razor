@@ -4,17 +4,18 @@
 @using Microsoft.Extensions.Configuration;
 @using Services;
 @using ShoppingList_WebClient.Data
+@using ShoppingList_WebClient.Pages
 
 @inject IConfiguration configuration
 @inject StateInfoService _userInfoService
 @inject AuthenticationStateProvider authenticationStateProvider
 
 <BlazoredToasts Position="ToastPosition.BottomRight"
-                Timeout="3"
-                IconType="IconType.FontAwesome"
-                SuccessClass="success-toast-override"
-                SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug" />
+Timeout="3"
+IconType="IconType.FontAwesome"
+SuccessClass="success-toast-override"
+SuccessIcon="fa fa-thumbs-up"
+ErrorIcon="fa fa-bug" />
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -35,6 +36,10 @@
 
 
 @code{
+
+    [CascadingParameter]
+    public Error Error { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
 
@@ -45,10 +50,15 @@
 
     async void TokenLoaded(string token)
     {
-
-        await Data.SignalRHelper.SignalRInitAsync(configuration, _userInfoService);
-
-
+        try
+        {
+            await Data.SignalRHelper.SignalRInitAsync(configuration, _userInfoService);
+        }
+        catch (Exception ex)
+        {
+            await Error.ProcessExceptionAsync(ex);
+            throw;
+        }
     }
 
 
