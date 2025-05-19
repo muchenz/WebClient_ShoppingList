@@ -37,7 +37,7 @@
 
     }
 
-    public void ProcessExceptionAsync(Exception ex)
+    public void ProcessException(Exception ex)
     {
 
         if (ex is HttpRequestException e && e.StatusCode == System.Net.HttpStatusCode.Unauthorized)

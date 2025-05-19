@@ -56,7 +56,7 @@ ErrorIcon="fa fa-bug" />
         }
         catch (Exception ex)
         {
-            await Error.ProcessExceptionAsync(ex);
+            Error.ProcessException(ex);
             throw;
         }
     }

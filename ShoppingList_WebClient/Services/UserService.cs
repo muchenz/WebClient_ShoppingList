@@ -128,33 +128,6 @@ namespace ShoppingList_WebClient.Services
 
         }
 
-        public async Task<string> GetUserDataTreeStringAsync(string userName)
-        {
-
-            var querry = new QueryBuilder();
-            querry.Add("userName", userName);
-            // querry.Add("password", password);
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "User/GetUserDataTree" + querry.ToString());
-
-
-            await SetRequestBearerAuthorizationHeader(requestMessage);
-            Console.WriteLine("!_______header ");
-
-            Console.WriteLine("!_______header " + requestMessage.Headers.Authorization.ToString());
-
-            var response = await _httpClient.SendAsync(requestMessage);
-            // var response =  await  _httpClient.PostAsync("User/GetUserDataTree" + querry.ToString(),
-            //     new StringContent("", Encoding.UTF8, "application/json"));
-            //var response = await _httpClient.PostAsJsonAsync<string>("User/GetUserDataTree" + querry.ToString(), "");
-
-            var data = await response.Content.ReadAsStringAsync();
-
-            var message = JsonConvert.DeserializeObject<MessageAndStatus>(data);
-
-
-            return await Task.FromResult(message.Message);
-        }
 
         public async Task<List<ListAggregationForPermission>> GetListAggregationForPermissionAsync(string userName)
         {
@@ -186,16 +159,29 @@ namespace ShoppingList_WebClient.Services
 
 
 
-        public async Task<User> GetUserDataTreeObjectsgAsync(string userName)
+        public async Task<User> GetUserDataTreeAsync()
         {
 
-            var dataString = await GetUserDataTreeStringAsync(userName);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "User/UserDataTree");
 
 
+            await SetRequestBearerAuthorizationHeader(requestMessage);
+            Console.WriteLine("!_______header ");
 
-            var dataObjects = JsonConvert.DeserializeObject<User>(dataString);
+            Console.WriteLine("!_______header " + requestMessage.Headers.Authorization.ToString());
 
-            return dataObjects;
+            var response = await _httpClient.SendAsync(requestMessage);
+            // var response =  await  _httpClient.PostAsync("User/GetUserDataTree" + querry.ToString(),
+            //     new StringContent("", Encoding.UTF8, "application/json"));
+            //var response = await _httpClient.PostAsJsonAsync<string>("User/GetUserDataTree" + querry.ToString(), "");
+
+            var data = await response.Content.ReadAsStringAsync();
+
+            var user = JsonConvert.DeserializeObject<User>(data);
+
+
+            return user;
         }
 
 
@@ -228,7 +214,8 @@ namespace ShoppingList_WebClient.Services
             var querry = new QueryBuilder();
 
             querry.Add("listAggregationId", listAggregationId.ToString());
-            // querry.Add("password", password);
+
+            //var httpMethod = actionName == "DeleteUserPermission" ? HttpMethod.Delete : HttpMethod.Post;
 
             string serializedUser = JsonConvert.SerializeObject(userPermissionToList);
 
@@ -248,11 +235,23 @@ namespace ShoppingList_WebClient.Services
 
             var responseStatusCode = response.StatusCode;
 
-            var responseBody = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
 
-            var message = JsonConvert.DeserializeObject<MessageAndStatus>(responseBody);
+                var message = JsonConvert.DeserializeObject<ProblemDetails>(responseBody);
 
-            return await Task.FromResult(message.Message);
+                return message.Title;
+            }
+
+            return actionName switch
+            {
+                "AddUserPermission" => "User was added.",
+                "ChangeUserPermission" => "Permission has changed.",
+                "InviteUserPermission" => "Ivitation was added.",
+                "DeleteUserPermission" => "User permission was deleted.",
+                _ => throw new ArgumentException("Bad action name.")
+            };
         }
 
 
