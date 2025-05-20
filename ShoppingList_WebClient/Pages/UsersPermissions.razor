@@ -218,11 +218,11 @@
             var info = await userService.ChangeUserPermission(itemClicked, chosedListAggrId);
 
 
-            if (info != "OK")
+            if (info.IsError)
             {
                 var param = new ModalParameters();
 
-                param.Add("Info", info);
+                param.Add("Info", info.Message);
 
                 Modal.Show<ModalInfo>("Information", param);
                 itemClicked.Permission = permissionWantToChange;
@@ -272,14 +272,14 @@
 
 
         var info = await userService.ChangeUserPermission(item, chosedListAggrId);
-
+        var message = info.Message;
 
         var param = new ModalParameters();
 
-        if (info == "OK")
+        if (info.IsSuccess)
         {
 
-            info = $"Permision of {item.Name} was changed sucessffully.";
+            message = $"Permision of {item.Name} was changed sucessffully.";
         }
         else
         {
@@ -288,7 +288,7 @@
 
         }
 
-        param.Add("Info", info);
+        param.Add("Info", message);
         var options = new ModalOptions()
         {
             DisableBackgroundCancel = true,
@@ -320,7 +320,7 @@
         var info = await userService.AddUserPermission(addEditUser, chosedListAggrId);
 
         var param = new ModalParameters();
-        param.Add("Info", info);
+        param.Add("Info", info.Message);
 
         Modal.Show<ModalInfo>("Information", param);
 
@@ -334,7 +334,7 @@
         var info = await userService.InviteUserPermission(addEditUser, chosedListAggrId);
 
         var param = new ModalParameters();
-        param.Add("Info", info);
+        param.Add("Info", info.Message);
 
         Modal.Show<ModalInfo>("Information", param);
 
@@ -425,7 +425,7 @@
 
 
             var param = new ModalParameters();
-            param.Add("Info", info);
+            param.Add("Info", info.Message);
 
             Modal.Show<ModalInfo>("Information", param);
     }

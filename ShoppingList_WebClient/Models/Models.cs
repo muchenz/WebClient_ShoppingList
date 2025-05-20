@@ -29,9 +29,23 @@ namespace ShoppingList_WebClient.Models
     }
     public class MessageAndStatus
     {
-        public bool IsError => Status == MessageSatus.Error;
+        public bool IsError => !IsSuccess;
+        public bool IsSuccess => Status == MessageSatus.OK;
         public string Status { get; set; }
         public string Message { get; set; }
+
+        protected MessageAndStatus(string message, string status)
+        {
+            Status = status;
+            Message = message;
+        }
+        public MessageAndStatus()
+        {
+
+        }
+
+        public static MessageAndStatus Ok(string msg) => new MessageAndStatus(msg, MessageSatus.OK);
+        public static MessageAndStatus Fail(string msg) => new MessageAndStatus(msg, MessageSatus.Error);
 
     }
     public class MessageAndStatusAndData<T> : MessageAndStatus
