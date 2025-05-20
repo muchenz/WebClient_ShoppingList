@@ -129,7 +129,7 @@ namespace ShoppingList_WebClient.Services
         }
 
 
-        public async Task<List<ListAggregationForPermission>> GetListAggregationForPermissionAsync(string userName)
+        public async Task<List<ListAggregationWithUsersPermission>> GetListAggregationForPermissionAsync(string userName)
         {
 
             var querry = new QueryBuilder();
@@ -150,7 +150,7 @@ namespace ShoppingList_WebClient.Services
 
 
             //  var dataObjects = JsonConvert.DeserializeObject<List<ListAggregationForPermissionTransferClass>>(data);
-            var dataObjects = JsonConvert.DeserializeObject<List<ListAggregationForPermission>>(message.Message);
+            var dataObjects = JsonConvert.DeserializeObject<List<ListAggregationWithUsersPermission>>(message.Message);
 
 
             return await Task.FromResult(dataObjects);

@@ -43,7 +43,7 @@
                                     ListItemDragStartEvent="(() => ListDragStart(null))"
                                     ListItemDropEvent="(() => ListDrop(null))"
                                     SaveItemEvent="(() => SaveListAggregator(item))"></ListItemComponent>*@
-                                <ListItemComponent item="@item.ListAggregatorEntity"
+                                <ListItemComponent item="@item.ListAggregator"
                                                    ListItemClickedEvent="(() => ListAggregationClicked(item))"
                                                    ChoosedItemId="@chosedListAggrId"></ListItemComponent>
 
@@ -204,7 +204,7 @@
 
 @code
 {
-    List<ListAggregationForPermission> data;
+    List<ListAggregationWithUsersPermission> data;
 
     UserPermissionToListAggregation addEditUser = new UserPermissionToListAggregation { Permission = 2, User = new User() };
 
@@ -378,10 +378,10 @@
 
     int chosedListAggrId;
 
-    void ListAggregationClicked(ListAggregationForPermission item)
+    void ListAggregationClicked(ListAggregationWithUsersPermission item)
     {
 
-        chosedListPermission = item.Users;
+        chosedListPermission = item.UsersPermToListAggr;
         chosedListAggrId = item.ListAggregatorEntity.ListAggregatorId;
     }
 
