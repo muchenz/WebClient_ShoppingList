@@ -23,10 +23,10 @@ namespace ShoppingList_WebClient.Data
         public static async Task SignalRInitAsync(IConfiguration configuration, StateInfoService userInfoService)
         {
             _hubConnection = new HubConnectionBuilder().WithUrl(configuration.GetSection("AppSettings")["SignlRAddress"]
-                ,(opts) =>
+                , (opts) =>
             {
                 opts.Headers.Add("Access_Token", userInfoService.Token);
-             
+
                 //Console.WriteLine($"tttttttttttoooooooooooooken_________: { userInfoService.Token}");
 
                 //    opts.HttpMessageHandlerFactory = (message) =>
@@ -39,11 +39,11 @@ namespace ShoppingList_WebClient.Data
                 //    };
             }
             ).WithAutomaticReconnect().Build();
-            
+
             await _hubConnection.StartAsync();
-           
+
             //Console.WriteLine($"tttttttttttoooooooooooooken: { userInfoService.Token}");
-            
+
             userInfoService.HubState.CallHuBReady(_hubConnection);
 
             userInfoService.ClientSignalRID = _hubConnection.ConnectionId;
@@ -201,8 +201,13 @@ namespace ShoppingList_WebClient.Data
                     {
 
 
-                        data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault().
-                       Lists.Where(a => a.ListId == parentId).FirstOrDefault().ListItems.Insert(0,item);
+                        var tempList = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault().
+                            Lists.Where(a => a.ListId == parentId).FirstOrDefault();
+
+                        if (!tempList.ListItems.Any(a => a.ListItemId == item.ListItemId))
+                        {
+                            tempList.ListItems.Insert(0, item);
+                        }
 
                         StateHasChanged();
                     }

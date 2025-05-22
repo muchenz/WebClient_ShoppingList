@@ -346,9 +346,7 @@
         {
             try
             {
-                var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
-                var userName = authProvider.User.Identity.Name;
-                data = await userService.GetListAggregationForPermissionAsync(userName);
+                data = await userService.GetListAggrWithUsersPermAsync();
             }
             catch
             {
@@ -382,7 +380,7 @@
     {
 
         chosedListPermission = item.UsersPermToListAggr;
-        chosedListAggrId = item.ListAggregatorEntity.ListAggregatorId;
+        chosedListAggrId = item.ListAggregator.ListAggregatorId;
     }
 
 
