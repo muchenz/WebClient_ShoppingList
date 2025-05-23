@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ShoppingList_WebClient.Data
@@ -77,7 +78,7 @@ namespace ShoppingList_WebClient.Data
             {
                 var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
 
-                dataAreChanged = _hubConnection.On("NewInvitation_" + userId, async () =>
+                dataAreChanged = _hubConnection.On("InvitationAreChanged_" + userId, async () =>
                 {
 
 
@@ -171,68 +172,88 @@ namespace ShoppingList_WebClient.Data
 
             });
 
-            var listAreChaned = _hubConnection.On("ListItemAreChanged_" + data.UserId, async (string command, int? id1, int? listAggregationId, int? parentId) =>
+            var listAreChaned = _hubConnection.On("ListItemAreChanged_" + data.UserId, async  (string eventName, string signaREventSerialized) =>
             {
+                
+                ListItemSignalREvent signaREvent = GetDeserializedSinglaREvent(signaREventSerialized);
 
+                var listAggregationId = signaREvent.ListAggregationId;
+                var listItemId = signaREvent.ListItemId;
 
-                if (command.EndsWith("ListItem"))
+                switch (eventName)
                 {
-                    var item = await shoppingListService.GetItem<ListItem>((int)id1, (int)listAggregationId);
-
-                    if (command == "Edit/Save_ListItem")
-                    {
-                        var lists = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault();
-
-                        ListItem foundListItem = null;
-                        foreach (var listItem in lists.Lists)
+                    case SiganalREventName.ListItemEdited:
                         {
-                            foundListItem = listItem.ListItems.FirstOrDefault(a => a.Id == id1);
-                            if (foundListItem != null) break;
+                            var item = await shoppingListService.GetItem<ListItem>(signaREvent.ListItemId, signaREvent.ListAggregationId);
+
+                            var lists = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault();
+
+                            ListItem foundListItem = null;
+                            foreach (var listItem in lists.Lists)
+                            {
+                                foundListItem = listItem.ListItems.FirstOrDefault(a => a.Id == listItemId);
+                                if (foundListItem != null) break;
+                            }
+                            if (foundListItem == null) return;
+                            foundListItem.ListItemName = item.ListItemName;
+                            foundListItem.State = item.State;
+                            StateHasChanged();
+
+                            break;
                         }
-                        if (foundListItem == null) return;
-                        foundListItem.ListItemName = item.ListItemName;
-                        foundListItem.State = item.State;
-                        StateHasChanged();
-
-
-                    }
-                    else
-                         if (command == "Add_ListItem")
-                    {
-
-
-                        var tempList = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault().
-                            Lists.Where(a => a.ListId == parentId).FirstOrDefault();
-
-                        if (!tempList.ListItems.Any(a => a.ListItemId == item.ListItemId))
+                    case SiganalREventName.ListItemAdded:
                         {
-                            tempList.ListItems.Insert(0, item);
+                            var addSignaREvent = signaREvent as AddListItemSignalREvent;
+                            var item = await shoppingListService.GetItem<ListItem>(signaREvent.ListItemId, signaREvent.ListAggregationId);
+
+
+                            var tempList = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault().
+                            Lists.Where(a => a.ListId == addSignaREvent.ListId).FirstOrDefault();
+
+                            if (!tempList.ListItems.Any(a => a.ListItemId == item.ListItemId))
+                            {
+                                tempList.ListItems.Insert(0, item);
+                            }
+
+                            StateHasChanged();
+                            break;
                         }
-
-                        StateHasChanged();
-                    }
-                    else
-                             if (command == "Delete_ListItem")
-                    {
-
-                        var lists = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault();
-
-                        ListItem foundListItem = null;
-                        List founfList = null;
-
-                        foreach (var listItem in lists.Lists)
+                    case SiganalREventName.ListItemDeleted:
                         {
-                            founfList = listItem;
-                            foundListItem = listItem.ListItems.FirstOrDefault(a => a.Id == id1);
-                            if (foundListItem != null) break;
+
+                            var lists = data.ListAggregators.Where(a => a.ListAggregatorId == listAggregationId).FirstOrDefault();
+
+                            ListItem foundListItem = null;
+                            List founfList = null;
+
+                            foreach (var listItem in lists.Lists)
+                            {
+                                founfList = listItem;
+                                foundListItem = listItem.ListItems.FirstOrDefault(a => a.Id == listItemId);
+                                if (foundListItem != null) break;
+                            }
+                            if (foundListItem == null) return;
+
+                            founfList.ListItems.Remove(foundListItem);
+
+                            StateHasChanged();
+
+                            break;
                         }
-                        if (foundListItem == null) return;
+                    default:
+                        break;
+                }
 
-                        founfList.ListItems.Remove(foundListItem);
-
-                        StateHasChanged();
-
-                    }
+                ListItemSignalREvent GetDeserializedSinglaREvent(string signaREventSerialized)
+                {
+                   
+                    return signaREvent = eventName switch
+                    {
+                        SiganalREventName.ListItemAdded => JsonSerializer.Deserialize<AddListItemSignalREvent>(signaREventSerialized),
+                        SiganalREventName.ListItemEdited => JsonSerializer.Deserialize<EditListItemSignalREvent>(signaREventSerialized),
+                        SiganalREventName.ListItemDeleted => JsonSerializer.Deserialize<DeleteListItemSignalREvent>(signaREventSerialized),
+                        _ => throw new ArgumentException("Unknown signaREvent")
+                    };
                 }
             });
 

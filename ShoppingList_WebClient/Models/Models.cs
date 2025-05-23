@@ -297,4 +297,20 @@ namespace ShoppingList_WebClient.Models
 
     }
 
+    public static class SiganalREventName
+    {
+        public const string ListItemEdited = nameof(ListItemEdited);
+        public const string ListItemAdded = nameof(ListItemAdded);
+        public const string ListItemDeleted = nameof(ListItemDeleted);
+        public const string InvitationAreChanged = nameof(InvitationAreChanged);
+        public const string DataAreChanged = nameof(DataAreChanged);
+    }
+
+    public record ListItemSignalREvent(int ListItemId, int ListAggregationId, string SignalRId);
+    public record AddListItemSignalREvent(int ListItemId, int ListAggregationId, int ListId, string SignalRId) :
+        ListItemSignalREvent(ListItemId, ListAggregationId, SignalRId);
+    public record DeleteListItemSignalREvent(int ListItemId, int ListAggregationId, string SignalRId) :
+        ListItemSignalREvent(ListItemId, ListAggregationId, SignalRId);
+    public record EditListItemSignalREvent(int ListItemId, int ListAggregationId, string SignalRId) :
+        ListItemSignalREvent(ListItemId, ListAggregationId, SignalRId);
 }
