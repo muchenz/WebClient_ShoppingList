@@ -306,11 +306,9 @@ namespace ShoppingList_WebClient.Models
         public const string DataAreChanged = nameof(DataAreChanged);
     }
 
-    public record ListItemSignalREvent(int ListItemId, int ListAggregationId, string SignalRId);
-    public record AddListItemSignalREvent(int ListItemId, int ListAggregationId, int ListId, string SignalRId) :
-        ListItemSignalREvent(ListItemId, ListAggregationId, SignalRId);
-    public record DeleteListItemSignalREvent(int ListItemId, int ListAggregationId, string SignalRId) :
-        ListItemSignalREvent(ListItemId, ListAggregationId, SignalRId);
-    public record EditListItemSignalREvent(int ListItemId, int ListAggregationId, string SignalRId) :
-        ListItemSignalREvent(ListItemId, ListAggregationId, SignalRId);
+    public record SignaREnvelope(string SignalRId, string SiglREventName, string SerializedEvent);
+    public abstract record ListItemSignalREvent(int ListItemId, int ListAggregationId);
+    public record ListItemAddedSignalREvent(int ListItemId, int ListAggregationId, int ListId) : ListItemSignalREvent(ListItemId, ListAggregationId);
+    public record ListItemDeletedSignalREvent(int ListItemId, int ListAggregationId) : ListItemSignalREvent(ListItemId, ListAggregationId);
+    public record ListItemEditedSignalREvent(int ListItemId, int ListAggregationId) : ListItemSignalREvent(ListItemId, ListAggregationId);
 }

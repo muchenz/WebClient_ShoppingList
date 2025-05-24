@@ -172,10 +172,15 @@ namespace ShoppingList_WebClient.Data
 
             });
 
-            var listAreChaned = _hubConnection.On("ListItemAreChanged_" + data.UserId, async  (string eventName, string signaREventSerialized) =>
+            var listAreChaned = _hubConnection.On("ListItemAreChanged_" + data.UserId, async  (string signaREnvelope) =>
             {
-                
+
+                var envelope = JsonSerializer.Deserialize<SignaREnvelope>(signaREnvelope);
+                var eventName = envelope.SiglREventName;
+                var signaREventSerialized = envelope.SerializedEvent;
+
                 ListItemSignalREvent signaREvent = GetDeserializedSinglaREvent(signaREventSerialized);
+
 
                 var listAggregationId = signaREvent.ListAggregationId;
                 var listItemId = signaREvent.ListItemId;
@@ -203,7 +208,7 @@ namespace ShoppingList_WebClient.Data
                         }
                     case SiganalREventName.ListItemAdded:
                         {
-                            var addSignaREvent = signaREvent as AddListItemSignalREvent;
+                            var addSignaREvent = signaREvent as ListItemAddedSignalREvent;
                             var item = await shoppingListService.GetItem<ListItem>(signaREvent.ListItemId, signaREvent.ListAggregationId);
 
 
@@ -249,9 +254,9 @@ namespace ShoppingList_WebClient.Data
                    
                     return signaREvent = eventName switch
                     {
-                        SiganalREventName.ListItemAdded => JsonSerializer.Deserialize<AddListItemSignalREvent>(signaREventSerialized),
-                        SiganalREventName.ListItemEdited => JsonSerializer.Deserialize<EditListItemSignalREvent>(signaREventSerialized),
-                        SiganalREventName.ListItemDeleted => JsonSerializer.Deserialize<DeleteListItemSignalREvent>(signaREventSerialized),
+                        SiganalREventName.ListItemAdded => JsonSerializer.Deserialize<ListItemAddedSignalREvent>(signaREventSerialized),
+                        SiganalREventName.ListItemEdited => JsonSerializer.Deserialize<ListItemEditedSignalREvent>(signaREventSerialized),
+                        SiganalREventName.ListItemDeleted => JsonSerializer.Deserialize<ListItemDeletedSignalREvent>(signaREventSerialized),
                         _ => throw new ArgumentException("Unknown signaREvent")
                     };
                 }
