@@ -48,7 +48,7 @@
 </div>
 @code {
 
-    string userName, password;
+        string userName, password;
 
     //private User user;
     public string LoginMesssage { get; set; }
@@ -104,10 +104,16 @@
                 }
 
             }
+            catch (HttpRequestException ex)
+            {
+                LoginMesssage = "Connection to server problem";
+
+                
+            }
             catch (Exception ex)
             {
                 LoginMesssage = "Some errors";
-                Error.ProcessError(ex);
+                //Error.ProcessError(ex);
                 throw new NullReferenceException("Inner ", ex);
 
             }
