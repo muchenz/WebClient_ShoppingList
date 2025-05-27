@@ -86,10 +86,8 @@
 
         try
         {
-            var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
-            var userName = authProvider.User.Identity.Name;
 
-            invitationsList = await userService.GetInvitationsListAsync(userName);
+            invitationsList = await userService.GetInvitationsListAsync();
 
             //_logger.LogError("alla2", userId);
 

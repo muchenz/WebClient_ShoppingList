@@ -68,9 +68,8 @@
         try
         {
             var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
-            var userName = authProvider.User.Identity.Name;
 
-            NuberOfInvitations = (await userService.GetInvitationsListAsync(userName)).Count;
+            NuberOfInvitations = (await userService.GetInvitationsListAsync()).Count;
 
             var userId = authProvider.User.Claims.Where(a => a.Type.EndsWith("nameidentifier")).FirstOrDefault().Value;
 

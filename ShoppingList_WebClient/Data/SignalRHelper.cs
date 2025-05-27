@@ -76,15 +76,12 @@ namespace ShoppingList_WebClient.Data
 
             try
             {
-                var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
 
                 dataAreChanged = _hubConnection.On("InvitationAreChanged_" + userId, async () =>
                 {
 
 
-                    var userName = authProvider.User.Identity.Name;
-
-                    var invitationsList = await userService.GetInvitationsListAsync(userName);
+                    var invitationsList = await userService.GetInvitationsListAsync();
 
                     int count = invitationsList?.Count ?? 0; // == null ? 0 : invitationsList.Count;
 

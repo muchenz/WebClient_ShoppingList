@@ -44,8 +44,8 @@ namespace ShoppingList_WebClient.Models
 
         }
 
-        public static MessageAndStatus Ok(string msg) => new MessageAndStatus(msg, MessageSatus.OK);
-        public static MessageAndStatus Fail(string msg) => new MessageAndStatus(msg, MessageSatus.Error);
+        public static MessageAndStatus Ok(string msg = MessageSatus.OK) => new MessageAndStatus(msg, MessageSatus.OK);
+        public static MessageAndStatus Fail(string msg = MessageSatus.Error) => new MessageAndStatus(msg, MessageSatus.Error);
 
     }
     public class MessageAndStatusAndData<T> : MessageAndStatus

@@ -250,13 +250,10 @@ namespace ShoppingList_WebClient.Services
         }
 
 
-        public async Task<List<Invitation>> GetInvitationsListAsync(string userName)
+        public async Task<List<Invitation>> GetInvitationsListAsync()
         {
-            var querry = new QueryBuilder();
-            querry.Add("userName", userName);
-            // querry.Add("password", password);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "Invitation/GetInvitationsList" + querry.ToString());
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "Invitation/InvitationsList");
 
 
             await SetRequestBearerAuthorizationHeader(requestMessage);
@@ -266,29 +263,26 @@ namespace ShoppingList_WebClient.Services
 
             var data = await response.Content.ReadAsStringAsync();
 
-            var message = JsonConvert.DeserializeObject<MessageAndStatus>(data);
+            var invitations = JsonConvert.DeserializeObject<List<Invitation>>(data);
 
-            var dataObjects = JsonConvert.DeserializeObject<List<Invitation>>(message.Message);
-
-
-            return await Task.FromResult(dataObjects);
+            return await Task.FromResult(invitations);
         }
 
 
 
-        public async Task<string> AcceptInvitationAsync(Invitation invitation)
+        public async Task<MessageAndStatus> AcceptInvitationAsync(Invitation invitation)
         {
             return await UniversalInvitationAction(invitation, "AcceptInvitation");
 
         }
-        public async Task<string> RejectInvitaionAsync(Invitation invitation)
+        public async Task<MessageAndStatus> RejectInvitaionAsync(Invitation invitation)
         {
 
             return await UniversalInvitationAction(invitation, "RejectInvitaion");
 
         }
 
-        async Task<string> UniversalInvitationAction(Invitation invitation, string actionName)
+        async Task<MessageAndStatus> UniversalInvitationAction(Invitation invitation, string actionName)
         {
             string serialized = JsonConvert.SerializeObject(invitation);
 
@@ -305,14 +299,11 @@ namespace ShoppingList_WebClient.Services
 
             var response = await _httpClient.SendAsync(requestMessage);
 
-            var responseStatusCode = response.StatusCode;
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            var message = JsonConvert.DeserializeObject<MessageAndStatus>(responseBody);
-
-
-            return await Task.FromResult(message.Message);
+            if (response.IsSuccessStatusCode)
+            {
+                return MessageAndStatus.Ok();
+            }
+            return MessageAndStatus.Fail();
         }
 
         void SetRequestAuthorizationLevelHeader(HttpRequestMessage httpRequestMessage, int listAggregationId)
