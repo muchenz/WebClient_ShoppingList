@@ -23,15 +23,15 @@ namespace ShoppingList_WebClient.Services
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
-        private readonly StateInfoService _userInfoService;
+        private readonly StateService _stateService;
 
         public UserService(HttpClient httpClient, IConfiguration configuration, ILocalStorageService localStorage
-            , StateInfoService userInfoService)
+            , StateService stateService)
         {
             _httpClient = httpClient;
             _configuration = configuration;// new ConfigMock();
             _localStorage = localStorage;
-            _userInfoService = userInfoService;
+            _stateService = stateService;
             var apiAddress = _configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"];
 
             _httpClient.BaseAddress = new Uri(apiAddress);
@@ -53,7 +53,7 @@ namespace ShoppingList_WebClient.Services
             }
 
 
-            httpRequestMessage.Headers.Add("SignalRId", _userInfoService.ClientSignalRID);
+            httpRequestMessage.Headers.Add("SignalRId", _stateService.StateInfo.ClientSignalRID);
 
             await Task.CompletedTask;
         }

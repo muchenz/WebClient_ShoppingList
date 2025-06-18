@@ -12,18 +12,18 @@ namespace ShoppingList_WebClient.Data
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly StateInfoService _userInfoService;
+        private readonly StateService _stateService;
 
         public ILocalStorageService _localStorageService { get; }
         public UserService _userService { get; set; }
 
         public CustomAuthenticationStateProvider(ILocalStorageService localStorageService,
-            UserService userService, StateInfoService userInfoService)
+            UserService userService, StateService userInfoService)
         {
             //throw new Exception("CustomAuthenticationStateProviderException");
             _localStorageService = localStorageService;
             _userService = userService;
-            _userInfoService = userInfoService;
+            _stateService = userInfoService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -44,12 +44,12 @@ namespace ShoppingList_WebClient.Data
                 try
                 {
                     identity = GetClaimsIdentity(accessToken);
-                    _userInfoService.Token = accessToken;
+                    _stateService.StateInfo.Token = accessToken;
                 }
                 catch
                 {
                     identity = new ClaimsIdentity();
-                    _userInfoService.Token = null;
+                    _stateService.StateInfo.Token = null;
                 }
             }
 
@@ -64,7 +64,7 @@ namespace ShoppingList_WebClient.Data
         {
             await _localStorageService.SetItemAsync("accessToken", token);
             //await _localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
-            _userInfoService.Token = token;
+            _stateService.StateInfo.Token = token;
 
             var identity = GetClaimsIdentity(token);
 
@@ -77,7 +77,7 @@ namespace ShoppingList_WebClient.Data
         {
             // _localStorageService.RemoveItemAsync("refreshToken");
             _localStorageService.RemoveItemAsync("accessToken");
-            _userInfoService.Token = null;
+            _stateService.StateInfo.Token = null;
 
             var identity = new ClaimsIdentity();
 

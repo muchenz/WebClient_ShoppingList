@@ -7,7 +7,8 @@
 @using ShoppingList_WebClient.Pages
 
 @inject IConfiguration configuration
-@inject StateInfoService _userInfoService
+@inject StateService stateService
+@inject SignalRService signalRService
 @inject AuthenticationStateProvider authenticationStateProvider
 
 <BlazoredToasts Position="ToastPosition.BottomRight"
@@ -39,27 +40,38 @@ ErrorIcon="fa fa-bug" />
 
     [CascadingParameter]
     public Error Error { get; set; }
+    private bool _signalRStarted = false;
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
 
-        _userInfoService.NewTokenLoadedEvent += TokenLoaded;
+        authenticationStateProvider.AuthenticationStateChanged += async task =>
+        {
+            var authState = await task;
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true && !_signalRStarted)
+            {
+                _signalRStarted = true;
+                await signalRService.StartConnectionAsync();
+            }
+            else if (!user.Identity?.IsAuthenticated == true && _signalRStarted)
+            {
+                _signalRStarted = false;
+                await signalRService.StopConnectionAsync();
+            }
+        };
+
+        var authState = await authenticationState;
+
+        var isAuth = authState.User.Identity?.IsAuthenticated ?? false;
+
+        if (!signalRService.IsConnected && isAuth)
+            await signalRService.StartConnectionAsync();
 
 
     }
-
-    async void TokenLoaded(string token)
-    {
-        try
-        {
-            await Data.SignalRHelper.SignalRInitAsync(configuration, _userInfoService);
-        }
-        catch (Exception ex)
-        {
-            Error.ProcessException(ex);
-            throw;
-        }
-    }
-
-
+    
 }

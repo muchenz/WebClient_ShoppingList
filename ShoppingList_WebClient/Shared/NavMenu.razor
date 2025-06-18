@@ -5,10 +5,10 @@
 @using System.Security.Claims;
 @using Microsoft.AspNetCore.SignalR.Client;
 
-
+@inject SignalRService signalRService
 @inject UserService userService
 @inject AuthenticationStateProvider authenticationStateProvider
-@inject StateInfoService stateInfoService
+@inject StateService stateInfoService
 
 
 <div class="top-row pl-4 navbar navbar-dark">
@@ -78,7 +78,7 @@
             authProvider.User.Claims.ToList().ForEach(a => Console.WriteLine($"claims {a.Type}, value {a.Value}"));
 
             if (userId != null)
-                SignalRInit(int.Parse(userId));
+                SignalRInit();
         }
         catch (Exception ex)
         {
@@ -96,30 +96,28 @@
 
     int NuberOfInvitations;
 
-    void SignalRInit(int userId)
+    void SignalRInit()
     {
-        async Task SignalRInitAsync(HubConnection _)
-        {
+      
 
+        SignalRToDispose = signalRService.RegisterInvitationAreChanedHandlers
+       (async () =>
+          await SignalRHandlers.SignalRInvitationInitAsync(
+       userService,
+       (_) => { },
+       (a) => NuberOfInvitations = a,
+       () => InvokeAsync(StateHasChanged)
+       ));
+        
 
-            SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
-                            userId,
-                            authenticationStateProvider,
-                            userService,
-                            (_) => { },
-                            (a) => NuberOfInvitations = a,
-                            StateHasChanged);
-        }
-
-        stateInfoService.HubState.JoinToHub(SignalRInitAsync);
 
     }
 
-    List<IDisposable> SignalRToDispose;
+    IDisposable SignalRToDispose;
 
     public void Dispose()
     {
-        SignalRToDispose?.ForEach(a => a?.Dispose());
+        SignalRToDispose?.Dispose();
     }
 }
 

@@ -18,8 +18,8 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject ILogger<Invitations> _logger
-@inject StateInfoService stateInfoService
-
+@inject StateService  stateService
+@inject SignalRService signalRService
 <h3>Invitations1</h3>
 
 <div class="container">
@@ -108,7 +108,7 @@
         {
 
             await LoadInvitationList();
-            await SignalRInit();
+            SignalRInit();
             StateHasChanged();
 
         }
@@ -116,26 +116,16 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    async Task SignalRInit()
+    void SignalRInit()
     {
 
-        var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
+        signalRService.JoinToHub(() =>
+        SignalRToDispose = signalRService.RegisterInvitationAreChanedHandlers(async () => await SignalRHandlers.SignalRInvitationInitAsync(
+         userService,
+          (a) => invitationsList = a,
+          (_) => { },
+          () => InvokeAsync(StateHasChanged))));
 
-        var userId = authProvider.User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
-
-        async Task SignalRInitAsync(HubConnection _)
-        {
-
-            SignalRToDispose = await SignalRHelper.SignalRInvitationInitAsync(
-                    int.Parse(userId),
-                    authenticationStateProvider,
-                    userService,
-                    (a) => invitationsList = a,
-                    (_) => { },
-                    StateHasChanged);
-        }
-
-        stateInfoService.HubState.JoinToHub(SignalRInitAsync);
     }
 
     public async Task AcceptInvitation(Invitation item)
@@ -154,11 +144,11 @@
 
     }
 
-    List<IDisposable> SignalRToDispose;
+    IDisposable SignalRToDispose;
 
     public void Dispose()
     {
-        SignalRToDispose?.ForEach(a => a?.Dispose());
+        SignalRToDispose?.Dispose();
     }
 
 }

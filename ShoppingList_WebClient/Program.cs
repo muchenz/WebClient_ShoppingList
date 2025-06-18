@@ -34,7 +34,8 @@ namespace ShoppingList_WebClient
 
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             //builder.Services.AddScoped<CustomAuthorizationHeaderHandler>(); 
-            builder.Services.AddSingleton(new StateInfoService());
+            builder.Services.AddScoped<StateService>();
+            builder.Services.AddScoped<SignalRService>();
 
 
             // services.AddHttpClient<UserService>();

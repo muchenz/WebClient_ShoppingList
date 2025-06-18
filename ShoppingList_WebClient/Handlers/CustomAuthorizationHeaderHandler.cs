@@ -10,12 +10,12 @@ namespace ShoppingList_WebClient.Handlers
 {
     public class CustomAuthorizationHeaderHandler : DelegatingHandler
     {
-        private readonly StateInfoService _userInfoService;
+        private readonly StateService _stateService;
         private readonly ILocalStorageService _localStorageService;
 
-        public CustomAuthorizationHeaderHandler(StateInfoService userInfoService, ILocalStorageService localStorageService)
+        public CustomAuthorizationHeaderHandler(StateService userInfoService, ILocalStorageService localStorageService)
         {
-            _userInfoService = userInfoService;
+            _stateService = userInfoService;
             _localStorageService = localStorageService;
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -23,9 +23,9 @@ namespace ShoppingList_WebClient.Handlers
 
             //var accessToken = await _localStorageService.GetItemAsync<string>("accessToken");
 
-            var accessToken = _userInfoService.Token;
+            var accessToken = _stateService.StateInfo.Token;
 
-              Console.WriteLine("________________CustomAuthorizationHeaderHandler  user service " + _userInfoService.Token);
+              Console.WriteLine("________________CustomAuthorizationHeaderHandler  user service " + _stateService.StateInfo.Token);
               Console.WriteLine("________________CustomAuthorizationHeaderHandler  local storage" + accessToken);
 
             if (accessToken != null)

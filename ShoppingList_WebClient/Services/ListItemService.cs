@@ -17,15 +17,15 @@ namespace ShoppingList_WebClient.Services
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
-        private readonly StateInfoService _userInfoService;
+        private readonly StateService _stateService;
 
         public ShoppingListService(HttpClient httpClient, IConfiguration configuration, ILocalStorageService localStorage
-            ,StateInfoService userInfoService)
+            , StateService stateService)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _localStorage = localStorage;
-            _userInfoService = userInfoService;
+            _stateService = stateService;
             _httpClient.BaseAddress = new Uri(_configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"]);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
 
@@ -45,7 +45,7 @@ namespace ShoppingList_WebClient.Services
                 // _httpClient.DefaultRequestHeaders.Add("Authorization", $"bearer  {token}");
             }
 
-            httpRequestMessage.Headers.Add("SignalRId", _userInfoService.ClientSignalRID);
+            httpRequestMessage.Headers.Add("SignalRId", _stateService.StateInfo.ClientSignalRID);
 
         }
 
