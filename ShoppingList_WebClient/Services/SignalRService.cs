@@ -21,7 +21,6 @@ public class SignalRService
     private readonly ILocalStorageService _localStorage;
     private readonly IConfiguration _configuration;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly IServiceProvider _serviceProvider;
     private readonly StateService _stateService;
     private HubConnection? _hubConnection;
     private int _userId;
@@ -37,7 +36,6 @@ public class SignalRService
         _localStorage = localStorage;
         _configuration = configuration;
         _authenticationStateProvider = authenticationStateProvider;
-        _serviceProvider = serviceProvider;
         _stateService = stateService;
     }
 

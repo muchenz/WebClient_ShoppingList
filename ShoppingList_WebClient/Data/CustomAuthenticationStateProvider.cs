@@ -37,6 +37,8 @@ namespace ShoppingList_WebClient.Data
             {
 
                 identity = new ClaimsIdentity();
+                _stateService.StateInfo.Token = null;
+
             }
             else
             {
