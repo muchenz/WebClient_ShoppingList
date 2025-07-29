@@ -70,7 +70,7 @@ namespace ShoppingList_WebClient.Data
             return await Task.FromResult(new AuthenticationState(claimsPrincipal));
         }
 
-        public async void MarkUserAsAuthenticated(string token, string refreshToken)
+        public async Task MarkUserAsAuthenticated(string token, string refreshToken)
         {
             await _localStorageService.SetItemAsync("accessToken", token);
             await _localStorageService.SetItemAsync("refreshToken", refreshToken);

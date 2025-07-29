@@ -5,6 +5,7 @@
 @using ShoppingList_WebClient.Data
 @using System.ComponentModel.DataAnnotations
 @using ShoppingList_WebClient.Models
+@using ShoppingList_WebClient.Models.Response
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -70,7 +71,7 @@
         //assume that user is valid
         //call an API
 
-        MessageAndStatusAndData<string> response = null;
+        MessageAndStatusAndData<UserNameAndTokensResponse> response = null;
         try
         {
             response = await userService.RegisterAsync(registrationrModel);
@@ -83,7 +84,7 @@
 
         if (!response.IsError)
         {
-            ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(response.Data);
+            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(response.Data.Token, response.Data.RefreshToken);
              NavigationManager.NavigateTo("index");
         }
         else

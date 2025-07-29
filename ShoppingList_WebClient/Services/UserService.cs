@@ -59,7 +59,7 @@ namespace ShoppingList_WebClient.Services
         }
 
 
-        public async Task<MessageAndStatusAndData<string>> RegisterAsync(RegistrationModel model)
+        public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> RegisterAsync(RegistrationModel model)
         {
 
             var loginRequest = new RegistrationRequest
@@ -80,17 +80,17 @@ namespace ShoppingList_WebClient.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var token = await response.Content.ReadAsStringAsync();
+                var tokens = await response.Content.ReadFromJsonAsync<UserNameAndTokensResponse>();
 
-                return MessageAndStatusAndData<string>.Ok(token);
+                return MessageAndStatusAndData<UserNameAndTokensResponse>.Ok(tokens);
             }
 
             return response switch
             {
                 { StatusCode: System.Net.HttpStatusCode.Conflict } =>
-                     MessageAndStatusAndData<string>.Fail("User exists."),
+                     MessageAndStatusAndData<UserNameAndTokensResponse>.Fail("User exists."),
                 _ =>
-                    MessageAndStatusAndData<string>.Fail("Server error."),
+                    MessageAndStatusAndData<UserNameAndTokensResponse>.Fail("Server error."),
             };
 
         }

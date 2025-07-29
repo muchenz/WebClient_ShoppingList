@@ -48,12 +48,12 @@
 </div>
 @code {
 
-        string userName, password;
+    string userName, password;
 
     //private User user;
     public string LoginMesssage { get; set; }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
 
         if (NavigationManager.GetParameter("error") != null)
@@ -63,16 +63,14 @@
         else if (NavigationManager.GetParameter("token") != null)
         {
             var token = NavigationManager.GetParameter("token");
+            var refreshToken = NavigationManager.GetParameter("refresh_token");
 
-            ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
-                .MarkUserAsAuthenticated(token);
+            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
+                .MarkUserAsAuthenticated(token, refreshToken);
             NavigationManager.NavigateTo("shoppinglist", true);
         }
 
-
-
-
-        return base.OnInitializedAsync();
+        await  base.OnInitializedAsync();
     }
 
     [CascadingParameter]
@@ -94,7 +92,7 @@
 
                 if (!message.IsError)
                 {
-                    ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(message.Data.Token);
+                    await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(message.Data.Token, message.Data.RefreshToken);
                     NavigationManager.NavigateTo("shoppinglist", true);
                 }
                 else
