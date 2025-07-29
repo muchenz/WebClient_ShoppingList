@@ -16,6 +16,7 @@ namespace ShoppingList_WebClient.Services
     public class StateInfo
     {
         public string Token { get; set; }
+        public string RefreshToken { get; set; }
         public string ClientSignalRID { get; set; }
 
     }
