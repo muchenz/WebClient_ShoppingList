@@ -1,5 +1,4 @@
-﻿using BlazorClient.Models.Response;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using ShoppingList_WebClient.Models.Response;
