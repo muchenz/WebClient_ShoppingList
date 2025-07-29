@@ -128,6 +128,15 @@ namespace ShoppingList_WebClient.Services
 
         }
 
+        public async Task LogOutAsync()
+        {
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "User/LogOut");
+
+            await SetRequestBearerAuthorizationHeader(requestMessage);
+
+            var response = await _httpClient.SendAsync(requestMessage);
+        }
 
         public async Task<List<ListAggregationWithUsersPermission>> GetListAggrWithUsersPermAsync()
         {
