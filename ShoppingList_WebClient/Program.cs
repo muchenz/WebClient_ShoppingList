@@ -36,10 +36,21 @@ namespace ShoppingList_WebClient
             //builder.Services.AddScoped<CustomAuthorizationHeaderHandler>(); 
             builder.Services.AddScoped<StateService>();
             builder.Services.AddScoped<SignalRService>();
+            builder.Services.AddScoped<TokenClientService>();
 
 
             // services.AddHttpClient<UserService>();
             // services.AddHttpClient<ShoppingListService>();
+
+            builder.Services.AddHttpClient<TokenClientService>(client => {
+                // code to configure headers etc..
+            }).ConfigurePrimaryHttpMessageHandler(() => {
+                var handler = new HttpClientHandler();
+
+                // handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+
+                return handler;
+            }).AddHttpMessageHandler<AuthRedirectHandler>();//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>();
 
             builder.Services.AddHttpClient<UserService>(client => {
                 // code to configure headers etc..

@@ -67,17 +67,17 @@ public class SignalRService
         {
             //opts.Headers.Add("Access_Token", accessToken);
 
-            opts.AccessTokenProvider = async () =>
-            {
-                if (_tokenClientService.IsTokenExpired())
-                {
-                    await _tokenClientService.RefreshTokensAsync();
-                }
+            //opts.AccessTokenProvider = async () =>
+            //{
+            //    if (_tokenClientService.IsTokenExpired())
+            //    {
+            //        await _tokenClientService.RefreshTokensAsync();
+            //    }
 
-                return _stateService.StateInfo.Token;
-            };
+            //    return _stateService.StateInfo.Token;
+            //};
 
-            //opts.Headers.Add("Authorization", $"Bearer {accessToken}"); //for normal authorization in HUB
+            opts.Headers.Add("Authorization", $"Bearer {accessToken}"); //for normal authorization in HUB
 
             //opts.HttpMessageHandlerFactory = (message) =>
             //{
