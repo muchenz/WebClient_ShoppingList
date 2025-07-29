@@ -96,7 +96,7 @@ namespace ShoppingList_WebClient.Services
         }
 
 
-        public async Task<MessageAndStatusAndData<UserNameAndTokenResponse>> LoginAsync(string userName, string password)
+        public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> LoginAsync(string userName, string password)
         {
             var loginRequest = new LoginRequest
             {
@@ -116,15 +116,15 @@ namespace ShoppingList_WebClient.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return MessageAndStatusAndData<UserNameAndTokenResponse>.Fail("Invalid username or password.");
+                return MessageAndStatusAndData<UserNameAndTokensResponse>.Fail("Invalid username or password.");
             }
 
             var content = await response.Content.ReadAsStringAsync();
 
-            var tokenAndUsername = JsonConvert.DeserializeObject<UserNameAndTokenResponse>(content);
+            var tokenAndUsername = JsonConvert.DeserializeObject<UserNameAndTokensResponse>(content);
 
 
-            return MessageAndStatusAndData<UserNameAndTokenResponse>.Ok(tokenAndUsername);
+            return MessageAndStatusAndData<UserNameAndTokensResponse>.Ok(tokenAndUsername);
 
         }
 
