@@ -29,29 +29,37 @@ namespace ShoppingList_WebClient.Data
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var isAccessToken = await _localStorageService.ContainKeyAsync("accessToken");
+            var isRefreshToken = await _localStorageService.ContainKeyAsync("refreshToken");
+
 
             ClaimsIdentity identity;
 
 
-            if (isAccessToken == false)
+            if (isAccessToken == false || isRefreshToken == false)
             {
 
                 identity = new ClaimsIdentity();
                 _stateService.StateInfo.Token = null;
+                _stateService.StateInfo.RefreshToken = null;
 
             }
             else
             {
                 var accessToken = await _localStorageService.GetItemAsync<string>("accessToken");
+                var refreshToken = await _localStorageService.GetItemAsync<string>("refreshToken");
+
                 try
                 {
                     identity = GetClaimsIdentity(accessToken);
                     _stateService.StateInfo.Token = accessToken;
+                    _stateService.StateInfo.RefreshToken = refreshToken;
                 }
                 catch
                 {
                     identity = new ClaimsIdentity();
                     _stateService.StateInfo.Token = null;
+                    _stateService.StateInfo.RefreshToken = null;
+
                 }
             }
 
@@ -62,11 +70,14 @@ namespace ShoppingList_WebClient.Data
             return await Task.FromResult(new AuthenticationState(claimsPrincipal));
         }
 
-        public async void MarkUserAsAuthenticated(string token)
+        public async void MarkUserAsAuthenticated(string token, string refreshToken)
         {
             await _localStorageService.SetItemAsync("accessToken", token);
+            await _localStorageService.SetItemAsync("refreshToken", refreshToken);
+
             //await _localStorageService.SetItemAsync("refreshToken", user.RefreshToken);
             _stateService.StateInfo.Token = token;
+            _stateService.StateInfo.RefreshToken = refreshToken;
 
             var identity = GetClaimsIdentity(token);
 
@@ -75,11 +86,14 @@ namespace ShoppingList_WebClient.Data
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
 
-        public void MarkUserAsLoggedOut()
+        public async Task  MarkUserAsLoggedOut()
         {
-            // _localStorageService.RemoveItemAsync("refreshToken");
-            _localStorageService.RemoveItemAsync("accessToken");
+            await _userService.LogOutAsync();
+            await _localStorageService.RemoveItemAsync("accessToken");
+            await _localStorageService.RemoveItemAsync("refreshToken");
+
             _stateService.StateInfo.Token = null;
+            _stateService.StateInfo.RefreshToken = null;
 
             var identity = new ClaimsIdentity();
 

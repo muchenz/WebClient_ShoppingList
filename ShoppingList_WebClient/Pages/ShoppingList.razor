@@ -624,7 +624,7 @@
             catch
             {
 
-                ((ShoppingList_WebClient.Data.CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+                await ((ShoppingList_WebClient.Data.CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
 
                 navigationManager.NavigateTo("login");
 

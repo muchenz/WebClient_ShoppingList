@@ -67,7 +67,7 @@ namespace ShoppingList_WebClient.Data2
                 catch (Exception ex)
                 {
 
-                    ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+                    await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
 
                     navigationManager.NavigateTo("login");
 
