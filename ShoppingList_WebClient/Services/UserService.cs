@@ -177,8 +177,16 @@ namespace ShoppingList_WebClient.Services
             //Console.WriteLine("!_______header ");
 
             //Console.WriteLine("!_______header " + requestMessage.Headers.Authorization.ToString());
-
-            var response = await _tokenHttpClient.SendAsync(requestMessage);
+            HttpResponseMessage response = null;
+            try
+            {
+                 response = await _tokenHttpClient.SendAsync(requestMessage);
+            }
+            catch (Exception ex)
+            {
+                var m = ex.Message;
+                throw;
+            }
             // var response =  await  _httpClient.PostAsync("User/GetUserDataTree" + querry.ToString(),
             //     new StringContent("", Encoding.UTF8, "application/json"));
             //var response = await _httpClient.PostAsJsonAsync<string>("User/GetUserDataTree" + querry.ToString(), "");
