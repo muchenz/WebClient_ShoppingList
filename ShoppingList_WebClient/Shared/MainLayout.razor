@@ -9,6 +9,7 @@
 @inject IConfiguration configuration
 @inject StateService stateService
 @inject SignalRService signalRService
+@inject Blazored.LocalStorage.ILocalStorageService localStorageService
 @inject AuthenticationStateProvider authenticationStateProvider
 
 <BlazoredToasts Position="ToastPosition.BottomRight"
@@ -46,6 +47,12 @@ ErrorIcon="fa fa-bug" />
 
     protected override async Task OnInitializedAsync()
     {
+        var isGid = await localStorageService.ContainKeyAsync("gid");
+        if (isGid is false)
+        {
+            await localStorageService.SetItemAsync("gid", Guid.NewGuid().ToString());
+        }
+
 
         authenticationStateProvider.AuthenticationStateChanged += async task =>
         {
