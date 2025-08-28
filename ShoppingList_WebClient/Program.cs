@@ -96,7 +96,7 @@ namespace ShoppingList_WebClient
 
 
             builder.Services.AddScoped<BrowserService>();
-            builder.Services.AddTransient<AuthRedirectHandler>();
+            builder.Services.AddScoped<AuthRedirectHandler>();
 
             builder.Services.AddBlazoredModal();
             builder.Services.AddBlazoredLocalStorage();
