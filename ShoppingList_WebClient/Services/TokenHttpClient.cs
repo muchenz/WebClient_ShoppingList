@@ -17,21 +17,19 @@ namespace ShoppingList_WebClient.Services;
 public class TokenHttpClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly HttpClient _httpClient;
     private readonly TokenClientService _tokenClientService;
     private readonly StateService _stateService;
     private readonly IConfiguration _configuration;
     private readonly string _apiAddress;
 
-    public TokenHttpClient(HttpClient httpClient, TokenClientService tokenClientService, StateService stateService,
+    public TokenHttpClient(IHttpClientFactory httpClientFactory, TokenClientService tokenClientService, StateService stateService,
          IConfiguration configuration)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _tokenClientService = tokenClientService;
         _stateService = stateService;
         _configuration = configuration;
         _apiAddress = _configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"];
-        _httpClient.BaseAddress = new Uri(_apiAddress);
     }
 
 
@@ -39,10 +37,8 @@ public class TokenHttpClient
    // public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken=default,  int? listAggregationId = null)
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, int? listAggregationId = null)
     {
-        //var httpClient = _httpClientFactory.CreateClient("api");
-        //httpClient.BaseAddress = new Uri(_apiAddress);
-        //await _tokenClientService.CheckAndSetNewTokens();
-        HttpClient httpClient = _httpClient;
+        var httpClient = _httpClientFactory.CreateClient("api");
+        httpClient.BaseAddress = new Uri(_apiAddress);
 
         if (listAggregationId is not null)
         {

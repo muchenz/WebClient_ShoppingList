@@ -67,22 +67,8 @@ namespace ShoppingList_WebClient
 
 
             var address = new Uri( new ConfigMock().GetSection("")["ShoppingWebAPIBaseAddress"]);
-                                 
 
-            //builder.Services.AddHttpClient("api", client => {
-            //    client.BaseAddress = address;
-
-            //    // code to configure headers etc..
-            //}).ConfigurePrimaryHttpMessageHandler(() => {
-            //    var handler = new HttpClientHandler();
-
-            //    //handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-
-            //    return handler;
-            //}).AddHttpMessageHandler<AuthRedirectHandler>();
-
-
-            builder.Services.AddHttpClient<TokenClientService>(client => {
+            builder.Services.AddHttpClient("api", client => {
                 client.BaseAddress = address;
 
                 // code to configure headers etc..
@@ -94,17 +80,7 @@ namespace ShoppingList_WebClient
                 return handler;
             }).AddHttpMessageHandler<AuthRedirectHandler>();
 
-            builder.Services.AddHttpClient<TokenHttpClient>(client => {
-                client.BaseAddress = address;
-
-                // code to configure headers etc..
-            }).ConfigurePrimaryHttpMessageHandler(() => {
-                var handler = new HttpClientHandler();
-
-                //handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-
-                return handler;
-            }).AddHttpMessageHandler<AuthRedirectHandler>();
+          
 
             builder.Services.AddHttpClient("log", client => {
                 // code to configure headers etc..

@@ -19,7 +19,6 @@ namespace ShoppingList_WebClient.Services;
 public class TokenClientService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly HttpClient _httpClient;
     private readonly ILocalStorageService _localStorage;
     private readonly IConfiguration _configuration;
     private readonly StateService _stateService;
@@ -27,16 +26,16 @@ public class TokenClientService
 
     public CancellationTokenSource _cts = new();
 
-    public TokenClientService(HttpClient httpClient, ILocalStorageService localStorage, IConfiguration configuration, StateService stateService
+    public TokenClientService(IHttpClientFactory httpClientFactory, ILocalStorageService localStorage, IConfiguration configuration, StateService stateService
         )
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _localStorage = localStorage;
         _configuration = configuration;
         _stateService = stateService;
 
          _apiAddress = _configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"];
-        _httpClient.BaseAddress = new Uri(_apiAddress);
+        //_httpClient.BaseAddress = new Uri(_apiAddress);
 
     }
     private readonly Guid _instanceId = Guid.NewGuid();
@@ -57,8 +56,7 @@ public class TokenClientService
     }
     private async Task<bool> RefreshTokensAsync(string accessToken, string refreshToken)
     {
-        //var httpClient = _httpClientFactory.CreateClient("api");
-        var httpClient = _httpClient;
+        var httpClient = _httpClientFactory.CreateClient("api");
         httpClient.BaseAddress = new Uri(_apiAddress);
 
         var requestMessage = new HttpRequestMessage(HttpMethod.Get, "User/GetNewToken");
