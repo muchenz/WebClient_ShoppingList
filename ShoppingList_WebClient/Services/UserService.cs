@@ -64,11 +64,11 @@ namespace ShoppingList_WebClient.Services
         public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> RegisterAsync(RegistrationModel model)
         {
             var gid = await _localStorage.GetItemAsync<string>("gid");
-
             var loginRequest = new RegistrationRequest
             {
                 UserName = model.UserName,
-                Password = model.Password
+                Password = model.Password,
+                DeviceId = gid,
             };
 
             var json = JsonConvert.SerializeObject(loginRequest);
@@ -101,10 +101,12 @@ namespace ShoppingList_WebClient.Services
 
         public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> LoginAsync(string userName, string password)
         {
+            var gid = await _localStorage.GetItemAsync<string>("gid");
             var loginRequest = new LoginRequest
             {
                 UserName = userName,
-                Password = password
+                Password = password,
+                DeviceId = gid
             };
 
             var json = JsonConvert.SerializeObject(loginRequest);
