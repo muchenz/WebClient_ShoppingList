@@ -24,14 +24,16 @@ namespace ShoppingList_WebClient.Services
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
         private readonly StateService _stateService;
+        private readonly TokenHttpClient _tokenHttpClient;
 
         public UserService(HttpClient httpClient, IConfiguration configuration, ILocalStorageService localStorage
-            , StateService stateService)
+            , StateService stateService,  TokenHttpClient tokenHttpClient)
         {
             _httpClient = httpClient;
             _configuration = configuration;// new ConfigMock();
             _localStorage = localStorage;
             _stateService = stateService;
+            _tokenHttpClient = tokenHttpClient;
             var apiAddress = _configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"];
 
             _httpClient.BaseAddress = new Uri(apiAddress);
@@ -133,9 +135,9 @@ namespace ShoppingList_WebClient.Services
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "User/LogOut");
 
-            await SetRequestBearerAuthorizationHeader(requestMessage);
+            //await SetRequestBearerAuthorizationHeader(requestMessage);
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _tokenHttpClient.SendAsync(requestMessage);
         }
 
         public async Task<List<ListAggregationWithUsersPermission>> GetListAggrWithUsersPermAsync()
@@ -145,10 +147,10 @@ namespace ShoppingList_WebClient.Services
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "Permissions/ListAggregationWithUsersPermission");
 
 
-            await SetRequestBearerAuthorizationHeader(requestMessage);
+            //await SetRequestBearerAuthorizationHeader(requestMessage);
 
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _tokenHttpClient.SendAsync(requestMessage);
 
             var data = await response.Content.ReadAsStringAsync();
 
@@ -168,12 +170,12 @@ namespace ShoppingList_WebClient.Services
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "User/UserDataTree");
 
 
-            await SetRequestBearerAuthorizationHeader(requestMessage);
-            Console.WriteLine("!_______header ");
+            //await SetRequestBearerAuthorizationHeader(requestMessage);
+            //Console.WriteLine("!_______header ");
 
-            Console.WriteLine("!_______header " + requestMessage.Headers.Authorization.ToString());
+            //Console.WriteLine("!_______header " + requestMessage.Headers.Authorization.ToString());
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _tokenHttpClient.SendAsync(requestMessage);
             // var response =  await  _httpClient.PostAsync("User/GetUserDataTree" + querry.ToString(),
             //     new StringContent("", Encoding.UTF8, "application/json"));
             //var response = await _httpClient.PostAsJsonAsync<string>("User/GetUserDataTree" + querry.ToString(), "");
@@ -230,10 +232,10 @@ namespace ShoppingList_WebClient.Services
               = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
 
-            await SetRequestBearerAuthorizationHeader(requestMessage);
-            SetRequestAuthorizationLevelHeader(requestMessage, listAggregationId);
+            //await SetRequestBearerAuthorizationHeader(requestMessage);
+            //SetRequestAuthorizationLevelHeader(requestMessage, listAggregationId);
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _tokenHttpClient.SendAsync(requestMessage,listAggregationId);
 
             var responseStatusCode = response.StatusCode;
 
@@ -265,10 +267,10 @@ namespace ShoppingList_WebClient.Services
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "Invitation/InvitationsList");
 
 
-            await SetRequestBearerAuthorizationHeader(requestMessage);
+            //await SetRequestBearerAuthorizationHeader(requestMessage);
 
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _tokenHttpClient.SendAsync(requestMessage);
 
             var data = await response.Content.ReadAsStringAsync();
 
@@ -304,9 +306,9 @@ namespace ShoppingList_WebClient.Services
               = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
 
-            await SetRequestBearerAuthorizationHeader(requestMessage);
+           // await SetRequestBearerAuthorizationHeader(requestMessage);
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            var response = await _tokenHttpClient.SendAsync(requestMessage);
 
             if (response.IsSuccessStatusCode)
             {
