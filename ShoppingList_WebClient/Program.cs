@@ -12,6 +12,7 @@ using ShoppingList_WebClient.Handlers;
 using ShoppingList_WebClient.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -123,14 +124,20 @@ public class AuthRedirectHandler : DelegatingHandler
     {
         var response = await base.SendAsync(request, cancellationToken);
 
+        var isRejectedByExpiredToken = false;
+        if (response.Headers.TryGetValues("Token-Expired", out var values))
+        {
+            isRejectedByExpiredToken = bool.Parse(values.FirstOrDefault("false"));
+        }
+
         if (response.StatusCode == HttpStatusCode.Unauthorized &&
-                !request.RequestUri.AbsolutePath.Contains("user/login", StringComparison.OrdinalIgnoreCase))
+            !request.RequestUri.AbsolutePath.Contains("user/login", StringComparison.OrdinalIgnoreCase) &&
+            !isRejectedByExpiredToken)
         {
             throw new UnauthorizedAccessException();
 
-
             //nie działa: 
-            //_navigation.NavigateTo("/login", forceLoad: true);
+            //_navigation.NavigateTo("/login", forceLoad: true);`
         }
 
         return response;

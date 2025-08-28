@@ -67,10 +67,7 @@ public class SignalRService
 
             opts.AccessTokenProvider = async () =>
             {
-                if (_tokenClientService.IsTokenExpired())
-                {
-                    await _tokenClientService.RefreshTokensAsync();
-                }
+                await _tokenClientService.CheckAndSetNewTokens();
 
                 return _stateService.StateInfo.Token;
             };
