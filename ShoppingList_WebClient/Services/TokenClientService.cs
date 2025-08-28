@@ -18,7 +18,6 @@ namespace ShoppingList_WebClient.Services;
 
 public class TokenClientService
 {
-    private readonly HttpClient _httpClient;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILocalStorageService _localStorage;
     private readonly IConfiguration _configuration;
@@ -57,7 +56,6 @@ public class TokenClientService
     private async Task<bool> RefreshTokensAsync(string accessToken, string refreshToken)
     {
         var httpClient = _httpClientFactory.CreateClient("api");
-        //var httpClient = _httpClient;
 
         httpClient.BaseAddress = new Uri(_apiAddress);
 

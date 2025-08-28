@@ -37,21 +37,13 @@ namespace ShoppingList_WebClient
             builder.Services.AddScoped<StateService>();
             builder.Services.AddScoped<SignalRService>();
             builder.Services.AddScoped<TokenClientService>();
+            builder.Services.AddScoped<TokenHttpClient>();
 
 
             // services.AddHttpClient<UserService>();
             // services.AddHttpClient<ShoppingListService>();
 
-            builder.Services.AddHttpClient<TokenClientService>(client => {
-                // code to configure headers etc..
-            }).ConfigurePrimaryHttpMessageHandler(() => {
-                var handler = new HttpClientHandler();
-
-                // handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-
-                return handler;
-            }).AddHttpMessageHandler<AuthRedirectHandler>();//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>();
-
+          
             builder.Services.AddHttpClient<UserService>(client => {
                 // code to configure headers etc..
             }).ConfigurePrimaryHttpMessageHandler(() => {
@@ -73,8 +65,8 @@ namespace ShoppingList_WebClient
             }).AddHttpMessageHandler<AuthRedirectHandler>();//.AddHttpMessageHandler<CustomAuthorizationHeaderHandler>(); 
 
 
-            //var address = new Uri( new ConfigMock().GetSection("")["ShoppingWebAPIBaseAddress"]);
-
+            var address = new Uri( new ConfigMock().GetSection("")["ShoppingWebAPIBaseAddress"]);
+                                 
 
             builder.Services.AddHttpClient("api", client => {
                 client.BaseAddress = address;
@@ -87,7 +79,6 @@ namespace ShoppingList_WebClient
 
                 return handler;
             }).AddHttpMessageHandler<AuthRedirectHandler>();
-
 
             builder.Services.AddHttpClient("log", client => {
                 // code to configure headers etc..
@@ -103,7 +94,7 @@ namespace ShoppingList_WebClient
 
 
             builder.Services.AddScoped<BrowserService>();
-            builder.Services.AddScoped<AuthRedirectHandler>();
+            builder.Services.AddTransient<AuthRedirectHandler>();
 
             builder.Services.AddBlazoredModal();
             builder.Services.AddBlazoredLocalStorage();

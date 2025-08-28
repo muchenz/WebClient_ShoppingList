@@ -84,7 +84,7 @@
 
         if (!response.IsError)
         {
-            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(response.Data.Token, response.Data.RefreshToken);
+            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticatedAsync(response.Data.Token, response.Data.RefreshToken);
              NavigationManager.NavigateTo("index");
         }
         else
