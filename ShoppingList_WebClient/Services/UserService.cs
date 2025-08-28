@@ -63,6 +63,7 @@ namespace ShoppingList_WebClient.Services
 
         public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> RegisterAsync(RegistrationModel model)
         {
+            var gid = await _localStorage.GetItemAsync<string>("gid");
 
             var loginRequest = new RegistrationRequest
             {
