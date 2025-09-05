@@ -77,8 +77,21 @@
 
             authProvider.User.Claims.ToList().ForEach(a => Console.WriteLine($"claims {a.Type}, value {a.Value}"));
 
-           // if (userId != null)
-                SignalRInit();
+            // if (userId != null)
+            SignalRInit();
+
+            authenticationStateProvider.AuthenticationStateChanged += async task =>
+                        {
+                            var authState = await task;
+                            var user = authState.User;
+
+                            if (user.Identity?.IsAuthenticated == true)
+                            {
+                                SignalRInit();
+                                return;
+                            }
+                            SignalRToDispose?.Dispose();
+                        };
         }
         catch (Exception ex)
         {
@@ -99,7 +112,7 @@
     void SignalRInit()
     {
 
-        signalRService.JoinToHub(()=>
+        signalRService.JoinToHub(() =>
         SignalRToDispose = signalRService.RegisterInvitationAreChanedHandlers
        (async () =>
           await SignalRHandlers.SignalRInvitationInitAsync(
