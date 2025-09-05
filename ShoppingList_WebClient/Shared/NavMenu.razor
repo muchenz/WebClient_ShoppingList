@@ -69,9 +69,13 @@
         {
             var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
 
-            NuberOfInvitations = (await userService.GetInvitationsListAsync()).Count;
+            var userId = authProvider.User.Claims.Where(a => a.Type.EndsWith("nameidentifier")).FirstOrDefault()?.Value;
+            
+            if (userId != null)
+            {
+                NuberOfInvitations = (await userService.GetInvitationsListAsync()).Count;
+            }
 
-            var userId = authProvider.User.Claims.Where(a => a.Type.EndsWith("nameidentifier")).FirstOrDefault().Value;
 
             Console.WriteLine($"NavMenu userid {userId}");
 
