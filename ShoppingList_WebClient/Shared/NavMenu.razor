@@ -70,7 +70,7 @@
             var authProvider = await authenticationStateProvider.GetAuthenticationStateAsync();
 
             var userId = authProvider.User.Claims.Where(a => a.Type.EndsWith("nameidentifier")).FirstOrDefault()?.Value;
-            
+
             if (userId != null)
             {
                 NuberOfInvitations = (await userService.GetInvitationsListAsync()).Count;
@@ -89,12 +89,18 @@
                             var authState = await task;
                             var user = authState.User;
 
-                            if (user.Identity?.IsAuthenticated == true)
+                            if (user.Identity?.IsAuthenticated == true && SignalRToDispose != null)
+                            {
+                                return;
+                            }
+
+                            if (user.Identity?.IsAuthenticated == true && SignalRToDispose == null)
                             {
                                 SignalRInit();
                                 return;
                             }
                             SignalRToDispose?.Dispose();
+                            SignalRToDispose = null;
                         };
         }
         catch (Exception ex)
