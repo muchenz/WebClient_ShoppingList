@@ -188,7 +188,7 @@ public class SignalRService
 
     public IDisposable RegisterInvitationAreChanedHandlers(Func<Task> func)
     {
-        return _hubConnection?.On("InvitationAreChaned_" + _userId, async () =>
+        return _hubConnection?.On("InvitationAreChanged_" + _userId, async () =>
         {
             await func();
         });

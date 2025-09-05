@@ -77,7 +77,7 @@
 
             authProvider.User.Claims.ToList().ForEach(a => Console.WriteLine($"claims {a.Type}, value {a.Value}"));
 
-            if (userId != null)
+           // if (userId != null)
                 SignalRInit();
         }
         catch (Exception ex)
@@ -98,8 +98,8 @@
 
     void SignalRInit()
     {
-      
 
+        signalRService.JoinToHub(()=>
         SignalRToDispose = signalRService.RegisterInvitationAreChanedHandlers
        (async () =>
           await SignalRHandlers.SignalRInvitationInitAsync(
@@ -107,8 +107,8 @@
        (_) => { },
        (a) => NuberOfInvitations = a,
        () => InvokeAsync(StateHasChanged)
-       ));
-        
+       )));
+
 
 
     }
