@@ -200,7 +200,7 @@ namespace ShoppingList_WebClient.Services
         }
 
 
-        public async Task<MessageAndStatus> AddUserPermission(UserPermissionToListAggregation userPermissionToList, int listAggregationId)
+        public async Task<MessageAndStatus> AddUserPermission(InviteUserRequest userPermissionToList, int listAggregationId)
         {
             return await UniversalUserPermission(userPermissionToList, listAggregationId, "AddUserPermission");
         }
@@ -218,12 +218,12 @@ namespace ShoppingList_WebClient.Services
             return await UniversalUserPermission(userPermissionToList, listAggregationId, "DeleteUserPermission");
         }
 
-        public async Task<MessageAndStatus> InviteUserPermission(UserPermissionToListAggregation userPermissionToList, int listAggregationId)
+        public async Task<MessageAndStatus> InviteUserPermission(InviteUserRequest userPermissionToList, int listAggregationId)
         {
             return await UniversalUserPermission(userPermissionToList, listAggregationId, "InviteUserPermission");
         }
 
-        private async Task<MessageAndStatus> UniversalUserPermission(UserPermissionToListAggregation userPermissionToList, int listAggregationId,
+        private async Task<MessageAndStatus> UniversalUserPermission(object userPermissionToList, int listAggregationId,
             string actionName)
         {
             var querry = new QueryBuilder();

@@ -4,6 +4,7 @@
 @using Services
 @using Models
 @using Blazored.LocalStorage;
+@using ShoppingList_WebClient.Models.Requests
 @inject UserService userService
 @inject ShoppingListService shoppingListService
 @inject ILocalStorageService localStorage
@@ -168,7 +169,7 @@
                         <td style="width:81%">
                             <EditForm Model="addEditUser">
 
-                                <InputText class="form-control" @bind-Value="addEditUser.User.EmailAddress" placeholder="Add new user" />
+                                <InputText class="form-control" @bind-Value="addEditUser.UserName" placeholder="Add new user" />
                             </EditForm>
                         </td>
 
@@ -206,7 +207,7 @@
 {
     List<ListAggregationWithUsersPermission> data;
 
-    UserPermissionToListAggregation addEditUser = new UserPermissionToListAggregation { Permission = 2, User = new User() };
+    InviteUserRequest addEditUser = new InviteUserRequest { Permission = 2,  UserName=""};
 
     [CascadingParameter] public IModalService Modal { get; set; }
 
