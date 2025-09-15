@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Net.Http.Json;
 using ShoppingList_WebClient.Models.Requests;
 using ShoppingList_WebClient.Models.Response;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
 namespace ShoppingList_WebClient.Services
 {
@@ -78,7 +79,6 @@ namespace ShoppingList_WebClient.Services
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
 
-
             var response = await _httpClient.SendAsync(requestMessage);
 
             if (response.IsSuccessStatusCode)
@@ -116,6 +116,7 @@ namespace ShoppingList_WebClient.Services
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
 
+            requestMessage.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
             var response = await _httpClient.SendAsync(requestMessage);
 

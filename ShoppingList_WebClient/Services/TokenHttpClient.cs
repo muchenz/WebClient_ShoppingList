@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
@@ -44,6 +45,7 @@ public class TokenHttpClient
         {
            SetRequestAuthorizationLevelHeader(request, (int)listAggregationId);
         }
+        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
         var signalRId = _stateService.StateInfo.ClientSignalRID;
 
@@ -74,6 +76,7 @@ public class TokenHttpClient
             {
                 SetRequestAuthorizationLevelHeader(requestClone, (int)listAggregationId);
             }
+            requestClone.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
             response = await httpClient.SendAsync(requestClone);
 
