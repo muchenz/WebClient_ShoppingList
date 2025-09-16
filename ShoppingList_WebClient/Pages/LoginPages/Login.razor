@@ -92,7 +92,7 @@
 
                 if (!message.IsError)
                 {
-                    await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticatedAsync (message.Data.Token, message.Data.RefreshToken);
+                    await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticatedAsync (message.Data.Token, string.Empty);
                     NavigationManager.NavigateTo("shoppinglist", true);
                 }
                 else

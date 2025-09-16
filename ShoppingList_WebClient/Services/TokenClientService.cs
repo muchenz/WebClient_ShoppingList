@@ -79,7 +79,7 @@ public class TokenClientService
 
         var tokensResponse = await response.Content.ReadFromJsonAsync<UserNameAndTokensResponse>();
 
-        await SetTokens(tokensResponse.Token, tokensResponse.RefreshToken);
+        await SetTokens(tokensResponse.Token, string.Empty);
         return true;
     }
 
