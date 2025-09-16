@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using ShoppingList_WebClient.Models.Response;
@@ -65,6 +66,7 @@ public class TokenClientService
                     = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
         requestMessage.Headers.Add("refresh_token", refreshToken);
         requestMessage.Headers.Add("deviceid", await _localStorage.GetItemAsync<string>("gid"));
+        requestMessage.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
         HttpResponseMessage response = null;
         response = await httpClient.SendAsync(requestMessage, _cts.Token);

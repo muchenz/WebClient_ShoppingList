@@ -45,7 +45,6 @@ public class TokenHttpClient
         {
            SetRequestAuthorizationLevelHeader(request, (int)listAggregationId);
         }
-        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
         var signalRId = _stateService.StateInfo.ClientSignalRID;
 
@@ -76,7 +75,6 @@ public class TokenHttpClient
             {
                 SetRequestAuthorizationLevelHeader(requestClone, (int)listAggregationId);
             }
-            requestClone.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
 
             response = await httpClient.SendAsync(requestClone);
 
