@@ -60,13 +60,16 @@
         {
             LoginMesssage = NavigationManager.GetParameter("error");
         }
-        else if (NavigationManager.GetParameter("token") != null)
+        else if (NavigationManager.GetParameter("id") != null)
         {
-            var token = NavigationManager.GetParameter("token");
+            //var token = NavigationManager.GetParameter("token");
             //var refreshToken = NavigationManager.GetParameter("refresh_token");
 
+            var id = NavigationManager.GetParameter("id");
+            var token = await userService.GetAccessTokenFromIdAsync(id);
+
             await ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
-                .MarkUserAsAuthenticatedAsync(token, string.Empty);
+                .MarkUserAsAuthenticatedAsync(token.AccessToken, string.Empty);
             NavigationManager.NavigateTo("shoppinglist", true);
         }
 
