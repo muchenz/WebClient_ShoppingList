@@ -200,7 +200,7 @@ namespace ShoppingList_WebClient.Services
             return user;
         }
 
-        public async Task<GetAccessTokenResponse> GetAccessTokenFromIdAsync(string id)
+        public async Task<MessageAndStatusAndData<GetAccessTokenResponse>> GetAccessTokenFromIdAsync(string id)
         {
             var querry = new QueryBuilder();
 
@@ -210,12 +210,17 @@ namespace ShoppingList_WebClient.Services
 
             var response = await _httpClient.SendAsync(requestMessage);
 
+            if (!response.IsSuccessStatusCode)
+            {
+                return MessageAndStatusAndData<GetAccessTokenResponse>.Fail("Try log again.");
+            }
+
             var data = await response.Content.ReadAsStringAsync();
 
             var token = JsonConvert.DeserializeObject<GetAccessTokenResponse>(data);
 
 
-            return await Task.FromResult(token);
+            return await Task.FromResult(MessageAndStatusAndData<GetAccessTokenResponse>.Ok(token));
         }
         public async Task<MessageAndStatus> AddUserPermission(InviteUserRequest userPermissionToList, int listAggregationId)
         {
