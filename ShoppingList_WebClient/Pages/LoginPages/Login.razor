@@ -63,10 +63,10 @@
         else if (NavigationManager.GetParameter("token") != null)
         {
             var token = NavigationManager.GetParameter("token");
-            var refreshToken = NavigationManager.GetParameter("refresh_token");
+            //var refreshToken = NavigationManager.GetParameter("refresh_token");
 
             await ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
-                .MarkUserAsAuthenticatedAsync(token, refreshToken);
+                .MarkUserAsAuthenticatedAsync(token, string.Empty);
             NavigationManager.NavigateTo("shoppinglist", true);
         }
 
