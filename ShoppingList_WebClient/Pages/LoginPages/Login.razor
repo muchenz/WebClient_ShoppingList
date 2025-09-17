@@ -64,16 +64,22 @@
         {
             //var token = NavigationManager.GetParameter("token");
             //var refreshToken = NavigationManager.GetParameter("refresh_token");
-
             var id = NavigationManager.GetParameter("id");
-            var token = await userService.GetAccessTokenFromIdAsync(id);
+
+            var message = await userService.GetAccessTokenFromIdAsync(id);
+
+            if (message.IsError)
+            {
+                LoginMesssage = message.Message;
+                return;
+            }
 
             await ((CustomAuthenticationStateProvider)AuthenticationStateProvider)
-                .MarkUserAsAuthenticatedAsync(token.AccessToken, string.Empty);
-            NavigationManager.NavigateTo("shoppinglist", true);
+                .MarkUserAsAuthenticatedAsync(message.Data.AccessToken, string.Empty);
+            NavigationManager.NavigateTo("/");
         }
 
-        await  base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
     [CascadingParameter]
