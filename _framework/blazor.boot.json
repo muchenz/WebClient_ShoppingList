@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "ShoppingList_WebClient",
   "resources": {
-    "hash": "sha256-GWdiBl+WM1HOMKyfyMjzvD5VoeQOabJbVVoXJoZ98n4=",
+    "hash": "sha256-oyYEBU6LsO5MR8C7IJk91EN6nrczrQJZMMI2eQXXRxU=",
     "jsModuleNative": {
       "dotnet.native.8.0.20.elargmqivm.js": "sha256-D0bzod5lwwSzPR43JC8TTCcZKw+3jIHOk8CZFCRj5is="
     },
@@ -57,7 +57,7 @@
       "Microsoft.Net.Http.Headers.wasm": "sha256-jfXK+cfJd/PteHB+5Bay/NDY9b9VLvVw6G/Bm262Lpo=",
       "netstandard.wasm": "sha256-+8svsZwJ/ukOvJqfgqLKi9WyLTg+w2TQezNnCU5rQ1Y=",
       "Newtonsoft.Json.wasm": "sha256-PaicHOw1U7HF05kEvZI0Rgg1nwdA8hrzbzdkw1qgUuU=",
-      "ShoppingList_WebClient.wasm": "sha256-vYUmw/tL+aEQ4cxmRJfKDnyLxQDSgU3SEVPrvctsa3k=",
+      "ShoppingList_WebClient.wasm": "sha256-uAJfyecqQ1hD+AO6a6aQS0zNT2+pHzp5TZKlLSAPRks=",
       "System.Buffers.wasm": "sha256-Zw9T3/ETmlM4L9YRe1eY585DLuleWVAAzabVdbxtgnc=",
       "System.Collections.Concurrent.wasm": "sha256-VTMuQcgn3A8m0+P/VKvpMaxTovVcxMuDXSDYME/KqbE=",
       "System.Collections.NonGeneric.wasm": "sha256-nts9ns96k6w3JGAlrUXEetf7/nB0eF2yWqGHoywykMU=",
