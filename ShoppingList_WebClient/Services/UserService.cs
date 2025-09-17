@@ -200,6 +200,7 @@ namespace ShoppingList_WebClient.Services
             return user;
         }
 
+        public async Task<GetAccessTokenResponse> GetAccessTokenFromIdAsync(string id)
 
         public async Task<MessageAndStatus> AddUserPermission(InviteUserRequest userPermissionToList, int listAggregationId)
         {
