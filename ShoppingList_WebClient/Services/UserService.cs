@@ -201,7 +201,22 @@ namespace ShoppingList_WebClient.Services
         }
 
         public async Task<GetAccessTokenResponse> GetAccessTokenFromIdAsync(string id)
+        {
+            var querry = new QueryBuilder();
 
+            querry.Add("id", id);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "User/GetAccessToken" + querry.ToString());
+
+
+            var response = await _httpClient.SendAsync(requestMessage);
+
+            var data = await response.Content.ReadAsStringAsync();
+
+            var token = JsonConvert.DeserializeObject<GetAccessTokenResponse>(data);
+
+
+            return await Task.FromResult(token);
+        }
         public async Task<MessageAndStatus> AddUserPermission(InviteUserRequest userPermissionToList, int listAggregationId)
         {
             return await UniversalUserPermission(userPermissionToList, listAggregationId, "AddUserPermission");
