@@ -115,7 +115,7 @@
 
 //            List<IDisposable> disposables = new List<IDisposable>();
 
-//            ////_hubConnection = new HubConnectionBuilder().WithUrl("https://94.251.148.92:8013/chatHub", (opts) =>
+//            ////_hubConnection = new HubConnectionBuilder().WithUrl("https://94.251.148.92:5013/chatHub", (opts) =>
 //            ////{
 //            ////_hubConnection = new HubConnectionBuilder().WithUrl("https://192.168.8.222:91/chatHub", (opts) =>
 //            ////{
