@@ -52,7 +52,7 @@ ErrorIcon="fa fa-bug" />
         {
             await localStorageService.SetItemAsync("gid", Guid.NewGuid().ToString());
         }
-
+        stateService.StateInfo.Gid = await localStorageService.GetItemAsync<string>("gid");
 
         authenticationStateProvider.AuthenticationStateChanged += async task =>
         {

@@ -10,6 +10,7 @@
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorageService
 @inject UserService userService;
+@inject StateService stateService;
 @inject ILogger<Login> _logger
 @inject IConfiguration configuration
 
@@ -134,7 +135,7 @@
     async Task FacebookSignIn()
     {
         var apiAddress = configuration.GetSection("AppSettings")["ShoppingWebAPIBaseAddress"];
-        var gid = await localStorageService.GetItemAsync<string>("gid");
+        var gid = stateService.StateInfo.Gid;
 
         NavigationManager.NavigateTo(string.Format("https://www.facebook.com/v10.0/dialog/oauth?client_id={0}&response_type=code&redirect_uri={1}&state={2}&scope={3}",
    259675572518658,

@@ -19,6 +19,7 @@ namespace ShoppingList_WebClient.Services
         public string RefreshToken { get; set; }
         public string ClientSignalRID { get; set; }
         public string UserName { get; set; }
+        public string Gid { get; set; }
 
     }
 

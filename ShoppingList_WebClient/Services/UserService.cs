@@ -64,7 +64,7 @@ namespace ShoppingList_WebClient.Services
 
         public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> RegisterAsync(RegistrationModel model)
         {
-            var gid = await _localStorage.GetItemAsync<string>("gid");
+            var gid = _stateService.StateInfo.Gid;
             var loginRequest = new RegistrationRequest
             {
                 UserName = model.UserName,
@@ -101,7 +101,7 @@ namespace ShoppingList_WebClient.Services
 
         public async Task<MessageAndStatusAndData<UserNameAndTokensResponse>> LoginAsync(string userName, string password)
         {
-            var gid = await _localStorage.GetItemAsync<string>("gid");
+            var gid = _stateService.StateInfo.Gid;
             var loginRequest = new LoginRequest
             {
                 UserName = userName,
